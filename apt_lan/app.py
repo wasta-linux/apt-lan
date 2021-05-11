@@ -107,10 +107,10 @@ class App(Gtk.Application):
 
         # Run functions for passed option.
         if 'system-sync' in options:
-            logging.info(f"option = system-sync")
+            logging.info(f"Starting system packages sync.")
             ret = cmd.run_system_sync(self.deb_archives)
         elif 'lan-sync' in options:
-            logging.info(f"option = lan-sync")
+            logging.info(f"Starting LAN packages sync.")
             print(f"Run lan-sync")
             ret = 0
         else:

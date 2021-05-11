@@ -14,7 +14,7 @@ def set_up_logging(app_name, base_path, loglevel):
     #shutil.chown(log_path, user=user, group=user)
     timestamp = time.strftime('%Y-%m-%d-%H%M%S')
     hostname = system.get_hostname()
-    log_file = timestamp + '-' + hostname + '.log'
+    log_file = f"{timestamp}-{hostname}.log"
     filename = log_path / log_file
     logging.basicConfig(
         filename=filename,
@@ -26,8 +26,7 @@ def set_up_logging(app_name, base_path, loglevel):
     logging.info('='*65)
     logging.info(f"{timestamp} {hostname} {app_name} started")
     logging.info('-'*65)
-    print(f"{app_name} log:")
-    print(filename)
+    print(f"{app_name} log: {filename}")
 
 def convert_bytes_to_human(bytes):
     units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']
