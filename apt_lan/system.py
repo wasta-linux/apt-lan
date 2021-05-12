@@ -33,6 +33,8 @@ def ensure_smb_setup(file):
     home = get_home()
     userid = get_userid()
     file = Path(file)
+    file_dir_path = file.parents[0]
+    file_dir_path.mkdir(parents=True, exist_ok=True)
     '''
     #VERSION 2
     path=/home/nate/.apt-lan/local-cache
