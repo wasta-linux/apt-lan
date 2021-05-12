@@ -4,6 +4,7 @@ import logging
 import os
 import shutil
 import subprocess
+import tempfile
 
 
 from pathlib import Path
@@ -211,11 +212,21 @@ def run_lan_sync(app):
         # Update superseded_debs list from LAN share.
         if 'superseded.txt' in ip_files[:]:
             uri = f"{share_dir_uri}/superseded.txt"
-            cmd = ['smbget', '--guest', uri]
-            result = subprocess.run(cmd)
-            logging.debug(f"smbget: {result}")
-            utils.test_exit()
-            superseded_debs_ip = pkg.get_superseded_debs()
+            # Use tempdir because smbget file is downloaded to CWD.
+            with Path(tempfile.mkdtemp()) as tempdir:
+                orig_cwd = os.getcwd()
+                os.chdir(tempdir)
+                logging.debug(f"cd to {tempdir}")
+                cmd = ['smbget', '--guest', uri]
+                result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                if result.returncode == 0:
+                    logging.debug(f"smbget: {result.stdout}")
+                else:
+                    logging.error(f"smbget: {result.stderr}")
+                os.chdir(orig_cwd)
+                logging.debug(f"cd to {orig_cwd}")
+                new_superseded = tempdir / 'superseded.txt'
+                superseded_debs_ip = pkgs.get_superseded_debs(new_superseded)
             ip_files.remove('superseded.txt')
         for s in superseded_debs_ip:
             if s not in superseded_debs_own:
