@@ -43,11 +43,11 @@ class App(Gtk.Application):
         self.apt_lan_dir = Path(home / '.apt-lan')
         self.log_dir = Path(self.apt_lan_dir / 'log')
 
-        os_rel = system.get_os_release()
-        arch_d = utils.get_arch_dir_name()
+        self.os_rel = system.get_os_release()
+        self.arch_d = utils.get_arch_dir_name()
         self.deb_archives = {
             'system': Path('/var/cache/apt/archives'),
-            'lan': Path(self.apt_lan_dir / 'local-cache' / os_rel / arch_d)
+            'lan': Path(self.apt_lan_dir / 'local-cache' / self.os_rel / self.arch_d)
         }
 
     def do_startup(self):
@@ -108,11 +108,10 @@ class App(Gtk.Application):
         # Run functions for passed option.
         if 'system-sync' in options:
             logging.info(f"Starting system packages sync.")
-            ret = cmd.run_system_sync(self.deb_archives)
+            ret = cmd.run_system_sync(self)
         elif 'lan-sync' in options:
             logging.info(f"Starting LAN packages sync.")
-            print(f"Run lan-sync")
-            ret = 0
+            ret = cmd.run_lan_sync(self)
         else:
             # Unknown options are handled elsewhere.
             ret = 1
