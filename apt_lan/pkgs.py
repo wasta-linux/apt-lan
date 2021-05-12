@@ -130,3 +130,38 @@ def ensure_destination(dest):
 def list_debs_to_copy(approved_debs, dest_debs):
     debs_to_copy = [d for d in approved_debs if d not in dest_debs]
     return debs_to_copy
+
+def create_packages_gz(dest_dir):
+    # Rebuild Packages.gz file.
+    cmd = ['dpkg-scanpackages', '--multiversion', dest_dir]
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='UTF-8')
+    output = result.stdout
+    pkg_file0 = dest_dir / 'Packages.0'
+    pkg_file0.write_text(output)
+
+    if pkg_file0.stat().st_size:
+        # Packages.0 file is good.
+        oldies = [dest_dir / 'Packages', dest_dir / 'Packages.gz']
+        for oldie in oldies:
+            oldie.unlink(missing_ok=True)
+        pkg_file = dest_dir / 'Packages'
+        pkg_file0.rename(pkg_file)
+        pkg_gz = dest_dir / 'Packages.gz'
+        pkg_gz.write_bytes(gzip.compress(pkg_file.read_bytes(), compresslevel=9))
+        logging.debug(f"{pkg_gz} done.")
+        ret = 0
+    else:
+        # Packages.0 file is zero size.
+        logging.error(f"{pkg_file0} not populated. Check dpkg-scanpackages log output.")
+        ret = 1
+    pkg_file0.unlink(missing_ok=True)
+    pkg_file.unlink(missing_ok=True)
+    return ret
+
+def get_superseded_debs(file):
+    superseded_debs = []
+    if file.is_file():
+        # Get list from file.
+        with open(file) as f:
+            superseded_debs = f.readlines()
+    return superseded_debs

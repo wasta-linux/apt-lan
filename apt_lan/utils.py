@@ -45,6 +45,12 @@ def get_arch_dir_name():
         arch_dir_name = '-'.join(['binary', os_proc])
     return arch_dir_name
 
+def delay_if_other_sync_in_progress(old_pkgs_gz):
+    while old_pkgs_gz.is_file():
+        # Another sync is in progress.
+        logging.info(f"Another sync is in progress. Delaying for 30 s.")
+        time.sleep(30)
+
 def test_exit(ret=9):
     print("(Early exit for testing.)")
     exit(ret)
