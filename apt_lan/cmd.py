@@ -1,10 +1,5 @@
 ''' Main command line processing '''
 
-# Required packages:
-#   - python3-smbc
-#   - smbclient
-
-import gzip
 import logging
 import os
 import shutil

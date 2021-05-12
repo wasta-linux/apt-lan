@@ -1,5 +1,10 @@
 ''' Main app structure '''
 
+# Required packages:
+#   - python3-smbc
+#   - samba
+#   - smbclient
+
 import gi
 import gzip
 import logging
