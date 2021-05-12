@@ -1,6 +1,7 @@
 ''' Functions related to debian package manipulation '''
 
 import gzip
+import logging
 import re
 import shutil
 import subprocess
