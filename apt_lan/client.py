@@ -2,8 +2,6 @@ import ipaddress
 import logging
 import netifaces
 import os
-# import pycurl
-# import smbc
 import socket
 import subprocess
 import time
@@ -19,7 +17,7 @@ def lan_connect(hostname, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         result = sock.connect_ex((hostname, port))
     logging.debug(f"result: {result}; {os.strerror(result)}")
-    return result == 0 or result == 111
+    return result == 0
 
 def get_info():
     gws = netifaces.gateways()
@@ -55,7 +53,7 @@ def get_info():
                 return lan_ip, netmask
     return None, None
 
-def get_lan_ips(own_ip, netmask, ports):
+def get_share_ips(own_ip, netmask, ports):
     """
     Search the local network for IPs with open share ports.
     """
@@ -76,31 +74,7 @@ def get_lan_ips(own_ip, netmask, ports):
         if found:
             logging.debug(f"LAN share IP found: {ip}")
             lan_ips.append(str(ip))
-
     return lan_ips
-
-def get_file_list_from_share(uri, port):
-    if port == 139: # SMB share
-        ctx = smbc.Context()
-    elif port == 21021: # Wasta FTP
-        pass
-    ip_files = []
-    try:
-        logging.debug(f"Getting file list from {uri}...")
-        items = ctx.opendir(uri).getdents()
-    except Exception as e:
-        # What happens if a samba share doesn't have the desired folder?
-        logging.error(f"smbc.ctx: {e}")
-        items = []
-    filenames = [i.name for i in items]
-    # Ignore any lan_cache that doesn't have Packages.gz file.
-    #   Or consider delaying instead of ignoring.
-    if 'Packages.gz' in filenames:
-        # Only available for LAN sync if Packages.gz exists.
-        ip_files = [n for n in filenames if n[-4:] == '.deb' or n == 'superseded.txt']
-    else:
-        logging.debug(f"No Packages.gz file. Skipping this apt-lan peer.")
-    return ip_files
 
 def get_smb_uri_smbget(uri):
     cmd = ['smbget', '--guest', uri] # smbget fails to retrieve files with "%" in them
@@ -123,19 +97,23 @@ def get_smb_uri_curl(uri):
     c.close()
 
 def get_ftp_file(ftp, filename):
+    logging.debug(f"Getting FTP file: {filename}")
     with open(filename, 'wb') as f:
         r = ftp.retrbinary(f'RETR {filename}', f.write)
-    logging.debug(f"Get FTP file: {r}")
+    logging.debug(f"Result: {r}")
 
 def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
     orig_cwd = os.getcwd()
     if dst_dir:
         os.chdir(dst_dir)
+        logging.debug(f"cd to {dst_dir}")
     uri_parts = share_uri.split('/')
     share_ip = uri_parts[2]
+    # Shared folder "local-cache" is parent. Only "focal", etc. are visible.
     dir_path = '/'.join(uri_parts[3:])
     logging.debug(f"Share IP: {share_ip}")
-    logging.debug(f"cd to {dst_dir}")
+    logging.debug(f"Share subfolder path: {dir_path}")
+
     if port == 139: # SMB
         for filename in filenames:
             uri = f"{share_uri}/{filename}"
@@ -143,16 +121,20 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             # get_smb_uri_curl(uri) # doesn't work with guest access
     elif port == 21021: # Wasta FTP
         ftp = FTP()
-        r = ftp.connect(host=share_ip, port=port, timeout=2)
-        logging.debug(f"ftp.connect: {r}")
+        try:
+            r = ftp.connect(host=share_ip, port=port, timeout=120)
+            logging.debug(f"ftp.connect: {r}")
+        except ConnectionRefusedError as e:
+            logging.debug(f"ftp.connect: {e}")
+            return 1
         r = ftp.login()
         logging.debug(f"ftp.login: {r}")
         r = ftp.cwd(dir_path)
         logging.debug(f"ftp.cwd: {r}")
         if filenames == None:
             # Get file list.
-            names = ftp.retrlines('NLST')
-            logging.debug(names)
+            names = ftp.nlst()
+            logging.debug(f"Files found at {share_ip}: {names}")
             return names
         else:
             # Get files.

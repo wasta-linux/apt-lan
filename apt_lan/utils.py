@@ -28,10 +28,6 @@ def get_hostname():
 def set_up_logging(app):
     log_path = Path(app.apt_lan_dir)
     log_path.mkdir(parents=True, exist_ok=True)
-    #shutil.chown(log_path, user=user, group=user)
-    # timestamp = time.strftime('%Y-%m-%d-%H%M%S')
-    # date = time.strftime('%Y-%m-%d')
-    # log_file = f"{timestamp}-{hostname}.log"
     log_file = f"{app.pkg_name}-{app.hostname}.log"
     file_path = log_path / log_file
     logging.basicConfig(

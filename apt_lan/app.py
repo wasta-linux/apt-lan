@@ -1,13 +1,8 @@
 ''' Main app structure '''
 
 # Required packages:
-#   - python3-pyftpdlib
-# ---------------------------
-#   - python3-pycurl
-#   - python3-smbc
-#   - samba
-#   - smbclient, needed by smbc? (was needed for smbget, which doesn't work well enough)
-
+#   - dpkg-dev (/usr/bin/dpkg-scanpackages)
+#   - python3-pyftpdlib (used to create FTP server)
 
 import gi
 import gzip
@@ -50,6 +45,9 @@ class App(Gtk.Application):
         self.pkg_name = 'apt-lan'
         self.hostname = utils.get_hostname()
         home = utils.get_home()
+        # TODO: Change to use system locations:
+        #   - /var/log/apt-lan.log
+        #   - /var/ftp/apt-lan/
         self.apt_lan_dir = Path(home) / '.apt-lan'
         self.share_path = self.apt_lan_dir / 'local-cache'
         self.log_dir = self.apt_lan_dir / 'log'
@@ -77,11 +75,6 @@ class App(Gtk.Application):
             # No command line args passed: print version? print help?.
             print("No options given.")
             return 1
-
-        # if len(options) > 1:
-        #     # Only one option accepted.
-        #     print("Too many options passed. Only one is accepted at a time.")
-        #     return 1
 
         if 'version' in options:
             chlog = Path(f"/usr/share/{self.pkg_name}/changelog.gz")

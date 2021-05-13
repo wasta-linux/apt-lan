@@ -6,7 +6,6 @@ import shutil
 import subprocess
 import tempfile
 
-
 from pathlib import Path
 
 from apt_lan import client, server, pkgs, utils
@@ -16,9 +15,9 @@ def run_server_sync(app):
     ret = 8 # rough completion level
 
     share_config = Path(f"/var/lib/samba/usershares/{app.pkg_name}")
-    # Ensure that samba share is properly configured.
-    # server.ensure_smb_setup(share_config, app.share_path)
+    # Ensure that file share is properly configured.
     server.ensure_ftp_setup(app.ports[0], app.share_path, app.loglevel)
+
     # Create a list of approved debs to copy from archives to local-cache:
     system_debs = pkgs.list_archive_debs(app.deb_archives.get('system'))
     logging.debug(f"System debs count: {len(system_debs)}")
@@ -30,7 +29,6 @@ def run_server_sync(app):
     logging.debug(f"Approved debs: {', '.join(approved_debs)}")
 
     # Copy debs in the approved list to lan_archive if adequate space.
-    # TODO: change this to initially copy to a "partial" sub-folder.
     dest_dir = app.deb_archives.get('lan')
     dest_stats = pkgs.ensure_destination(dest_dir)
     logging.debug(f"LAN archive path: {dest_dir}")
@@ -108,12 +106,6 @@ def run_server_sync(app):
     if pkgs_gz.is_file():
         pkgs_gz.rename(old_pkgs_gz)
 
-    # TODO: What do I do about blocking APT at this point? I don't want to resort
-    #   to anything that requires elevated privileges. This would be the only time
-    #   they're needed.
-
-    # TODO: Move files from "partial" sub-folder into true destination.
-
     # Prepare to gather package lists.
     kept_debs = []                                                  # newest
     dest_debs = pkgs.ensure_destination(dest_dir).get('Packages')   # existing in destination
@@ -125,7 +117,6 @@ def run_server_sync(app):
     output = result.stdout.splitlines()
     logging.info(f"{len(output)} amd64 packages found.")
     for line in output:
-        # if any(i in line for i in ['Filename: ']):
         if 'Filename: ' in line:
             deb = line.split(':')[1].strip().split('/')[-1]
             kept_debs.append(deb)
@@ -140,7 +131,6 @@ def run_server_sync(app):
     logging.info(f"{len(output)} i386 packages found.")
     # Add scanned packages to kept_debs list.
     for line in output:
-        # if any(i in line for i in ['Filename: ']):
         if 'Filename: ' in line:
             deb = line.split(':')[1].strip().split('/')[-1]
             kept_debs.append(deb)
@@ -171,63 +161,52 @@ def run_server_sync(app):
     ret = 1
 
     # Rebuild Packages.gz file.
-    logging.info(f"Creating Packages.gz file...")
-    response = pkgs.create_packages_gz(dest_dir)
-    if response == 0:
-        logging.info(f"Packages.gz file created.")
-        old_pkgs_gz.unlink(missing_ok=True)
-        logging.debug(f"Packages.gz.old removed.")
-        ret = 0
-    else:
-        # TODO: What to do if pkgs.create_packages_gz failed?
-        logging.error(f"Packages.gz file creation failed. Falling back to previous version, if it exists.")
-        if old_pkgs_gz.is_file():
-            old_pkgs_gz.rename(pkgs_gz)
+    pkgs.rebuild_pkgs_gz(dest_dir, pkgs_gz, old_pkgs_gz)
 
-    # TODO: What do I do about unblocking APT at this point? I don't want to resort
-    #   to anything that requires elevated privileges. This would be the only place
-    #   they're needed.
     logging.info("System packages sync complete.\n")
-
     return ret
 
 def run_client_sync(app):
     ret = 9
     # Outline:
-    #   - Find LAN sources. (assumes a /24 IPv4 subnet for now)
+    #   - Find LAN sources. (assumes IPv4 for now)
     #   - Sync their packages locally.
     #       - only same release and arch
     #   - Rebuild local Packages.gz
 
     dest_dir = app.deb_archives.get('lan')
     local_debs = pkgs.list_archive_debs(dest_dir)
+    pkgs_gz = dest_dir / 'Packages.gz'
+    old_pkgs_gz = dest_dir / 'Packages.gz.old'
 
-    # Find LAN sources.
-    #   - Discover LAN IPs and subnet.
+    # Get LAN IP and subnet.
     own_ip, netmask = client.get_info()
     if not own_ip or not netmask:
         logging.error(f"LAN details not found; device: {device}, family: {conn_fam}, gateway: {conn_gw}")
         return ret
 
-    # Loop through IPs and copy debs from each one.
-    #   - List LAN IPs with samba shares.
-    #   - Search IPs for shares called "apt-lan"
-    lan_ips = client.get_lan_ips(own_ip, netmask, app.ports)
-    logging.info(f"{len(lan_ips)} LAN share IPs found.")
-    logging.debug(f"LAN share IPs: {lan_ips}")
-    superseded_debs_own = pkgs.get_superseded_debs(dest_dir / 'superseded.txt')
+    # Loop through LAN IPs and copy debs from each one.
+    #   - List LAN IPs with correct port open.
+    share_ips = client.get_share_ips(own_ip, netmask, app.ports)
+    logging.info(f"{len(share_ips)} LAN share IPs found.")
+    logging.debug(f"LAN share IPs: {share_ips}")
+    superseded_debs_file = dest_dir / 'superseded.txt'
+    superseded_debs_own = pkgs.get_superseded_debs(superseded_debs_file)
     logging.debug(f"{len(superseded_debs_own)} superseded packages already identified.")
-    for ip in lan_ips:
-        # share_uri = f"smb://{ip}/apt-lan/{app.os_rel}/{app.arch_d}"
-        share_uri = f"ftp://{ip}/local-cache/{app.os_rel}/{app.arch_d}"
+    for ip in share_ips:
+        share_uri = f"ftp://{ip}/{app.os_rel}/{app.arch_d}"
         # Get file list from IP address.
-        # ip_files = client.get_file_list_from_share(share_uri, app.ports[0])
         ip_files = client.get_files_from_share(share_uri, app.ports[0])
-        logging.debug(f"{len(ip_files)} files found at {ip} for {app.os_rel}, {app.arch_d}.")
+        logging.info(f"{len(ip_files)} files found at {ip} for {app.os_rel}/{app.arch_d}.")
 
+        # Skip this server if another sync is in progress there.
+        if 'Packages.gz.old' in ip_files:
+            logging.info(f"Another sync is in progress at {ip}. Skipping.")
+            return 2
         # Update superseded_debs list from LAN share.
+        superseded_debs = []
         if 'superseded.txt' in ip_files[:]:
-            # Use tempdir because smbget file is downloaded to CWD.
+            # Use tempdir because file will be downloaded to CWD.
             with Path(tempfile.mkdtemp()) as tempdir:
                 client.get_files_from_share(share_uri, app.ports[0], ["superseded.txt"], tempdir)
                 new_superseded = tempdir / 'superseded.txt'
@@ -238,18 +217,40 @@ def run_client_sync(app):
                 superseded_debs_own.append(s)
         superseded_debs_own.sort()
 
+        # Update superseded_debs_file.
+        with open(superseded_debs_file, 'w') as f:
+            for deb in superseded_debs_own:
+                f.write(f"{deb}\n")
+        logging.debug(f"Superseded packages file: {superseded_debs_file}.")
+        # logging.info(f"{len(kept_debs)} packages in apt-lan cache. {len(superseded_debs_own)} others are listed as obsolete. {len(removed_debs)} were removed.")
+
+        # Rename Packages.gz file (if it exists) during file changes.
+        if pkgs_gz.is_file():
+            pkgs_gz.rename(old_pkgs_gz)
+
         # Get new packages from LAN share.
-        debs_to_get = [d for d in ip_files if d not in local_debs and d not in superseded_debs_own]
+        debs_to_get = [d for d in ip_files if d[-4:] == '.deb' and d not in local_debs and d not in superseded_debs_own]
+        logging.info(f"{len(debs_to_get)} packages to get from {ip}.")
+        if len(debs_to_get) == 0:
+            # Already up-to-date. Nothing more to do.
+            logging.info(f'LAN packages already synced from {ip}.\n')
+            return 0
         logging.debug(f"Packages to get from {ip}: {debs_to_get}")
-        client.get_files_from_share(share_uri, debs_to_get, dest_dir)
+        client.get_files_from_share(share_uri, app.ports[0], debs_to_get, dest_dir)
 
-    # Take local share off the network while rebuilding cache.
+        # Rebuild Packages.gz file.
+        pkgs.rebuild_pkgs_gz(dest_dir, pkgs_gz, old_pkgs_gz)
+        return 0
 
-    # Remove obsolete packages.
-
-    # Rebuild Packages.gz
-
-    # Put local share back on the network.
+    # Ensure correct Packages.gz file.
+    final_debs = pkgs.list_archive_debs(dest_dir)
+    if final_debs != local_debs or not pkgs_gz.is_file():
+        # Rebuild Packages.gz file.
+        #   TODO: This rebuilds it unnecessarily if any packages were added above.
+        #       But the point is to make sure the folder ends in an accurate
+        #       state, regardless of how successful the sync was. Ideally, I
+        #       would just confirm that Packages.gz matches the file list.
+        pkgs.rebuild_pkgs_gz(dest_dir, pkgs_gz, old_pkgs_gz)
 
     logging.info("LAN packages sync complete.\n")
     return ret

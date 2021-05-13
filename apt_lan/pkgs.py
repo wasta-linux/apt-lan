@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def get_good_repos():
-    # TODO: Store this list in a file for easier updating.
+    # TODO: Store this list in a file for easier maintenance.
     good_repos = [
         'http://archive.ubuntu.com/ubuntu focal main',
         'http://archive.ubuntu.com/ubuntu focal-updates main',
@@ -167,3 +167,20 @@ def get_superseded_debs(file):
         with open(file) as f:
             superseded_debs = f.readlines()
     return superseded_debs
+
+def rebuild_pkgs_gz(dest_dir, pkgs_gz, old_pkgs_gz):
+    # Rebuild Packages.gz file.
+    logging.info(f"Creating Packages.gz file...")
+    r = create_packages_gz(dest_dir)
+    if r == 0:
+        logging.info(f"Packages.gz file created.")
+        old_pkgs_gz.unlink(missing_ok=True)
+        logging.debug(f"Packages.gz.old removed.")
+        ret = 0
+    else:
+        # Fall back if pkgs.create_packages_gz failed.
+        logging.error(f"Packages.gz file creation failed. Falling back to previous version, if it exists.")
+        if old_pkgs_gz.is_file():
+            old_pkgs_gz.rename(pkgs_gz)
+        ret = 1
+    return ret
