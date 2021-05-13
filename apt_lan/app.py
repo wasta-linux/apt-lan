@@ -60,6 +60,8 @@ class App(Gtk.Application):
             'system': Path('/var/cache/apt/archives'),
             'lan': self.share_path / self.os_rel / self.arch_d
         }
+        self.ports = [139, 445] # SMB
+        self.ports = [21021] # Wasta FTP
 
     def do_startup(self):
         Gtk.Application.do_startup(self)

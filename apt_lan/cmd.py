@@ -18,7 +18,7 @@ def run_server_sync(app):
     share_config = Path(f"/var/lib/samba/usershares/{app.pkg_name}")
     # Ensure that samba share is properly configured.
     # server.ensure_smb_setup(share_config, app.share_path)
-    server.ensure_ftp_setup(app.share_path)
+    server.ensure_ftp_setup(app.ports[0], app.share_path)
     # Create a list of approved debs to copy from archives to local-cache:
     system_debs = pkgs.list_archive_debs(app.deb_archives.get('system'))
     logging.debug(f"System debs count: {len(system_debs)}")
@@ -207,9 +207,7 @@ def run_client_sync(app):
     # Loop through IPs and copy debs from each one.
     #   - List LAN IPs with samba shares.
     #   - Search IPs for shares called "apt-lan"
-    ports = [139, 445] # SMB
-    ports = [21021] # Wasta FTP
-    lan_ips = client.get_lan_ips(own_ip, netmask, ports)
+    lan_ips = client.get_lan_ips(own_ip, netmask, app.ports)
     logging.info(f"{len(lan_ips)} LAN samba IPs found.")
     logging.debug(f"LAN samba IPs: {lan_ips}")
     superseded_debs_own = pkgs.get_superseded_debs(dest_dir / 'superseded.txt')
@@ -218,15 +216,15 @@ def run_client_sync(app):
         # share_uri = f"smb://{ip}/apt-lan/{app.os_rel}/{app.arch_d}"
         share_uri = f"ftp://{ip}/local-cache/{app.os_rel}/{app.arch_d}"
         # Get file list from IP address.
-        # ip_files = client.get_file_list_from_share(share_uri, ports[0])
-        ip_files = client.get_files_from_share(share_uri, ports[0])
+        # ip_files = client.get_file_list_from_share(share_uri, app.ports[0])
+        ip_files = client.get_files_from_share(share_uri, app.ports[0])
         logging.debug(f"{len(ip_files)} files found at {ip} for {app.os_rel}, {app.arch_d}.")
 
         # Update superseded_debs list from LAN share.
         if 'superseded.txt' in ip_files[:]:
             # Use tempdir because smbget file is downloaded to CWD.
             with Path(tempfile.mkdtemp()) as tempdir:
-                client.get_files_from_share(share_uri, ports[0], ["superseded.txt"], tempdir)
+                client.get_files_from_share(share_uri, app.ports[0], ["superseded.txt"], tempdir)
                 new_superseded = tempdir / 'superseded.txt'
                 superseded_debs_ip = pkgs.get_superseded_debs(new_superseded)
             ip_files.remove('superseded.txt')
