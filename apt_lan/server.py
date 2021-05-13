@@ -44,12 +44,18 @@ def ensure_ftp_setup(port, share_path):
     """
     share_path.mkdir(parents=True, exist_ok=True)
     script = Path(__file__).parents[0] / 'serve-ftp.py'
-    # TODO: Only start the server if the port is closed.
-    print(psutil.net_connections())
-    exit()
-    ftp_proc = subprocess.Popen(
-        [script, share_path],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT
-    )
-    logging.debug(f"Started FTP server: {ftp_proc}")
+    # Only start the server if the given port is closed.
+    connections = psutil.net_connections()
+    wasta_ftp = False
+    for c in connections:
+        if c.port == port:
+            logging.debug(f"FTP check: {c}")
+            wasta_ftp = True
+            break
+    if not wasta_ftp:
+        ftp_proc = subprocess.Popen(
+            [script, share_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        )
+        logging.debug(f"Started FTP server: {ftp_proc}")
