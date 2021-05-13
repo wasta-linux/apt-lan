@@ -44,7 +44,7 @@ def ensure_ftp_setup(share_path):
     Ensure proper setup of FTP server and share.
     """
     authorizer = DummyAuthorizer()
-    authorizer.add_anonymous(share_path, perm="elr")
+    authorizer.add_anonymous(str(share_path), perm="elr")
     handler = FTPHandler
     handler.authorizer = authorizer
     server = FTPServer(("127.0.0.1", 21021), handler)
