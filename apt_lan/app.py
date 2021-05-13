@@ -22,7 +22,7 @@ from pathlib import Path
 # Add repo to sys.path if uninstalled.
 root = Path(__file__).parents[1].resolve()
 if root.name == 'apt-lan':
-    sys.path.append(root)
+    sys.path.append(str(root))
 
 from apt_lan import cmd, server, system, utils
 
