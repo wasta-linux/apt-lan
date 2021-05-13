@@ -12,7 +12,7 @@ from pathlib import Path
 from apt_lan import client, server, pkgs, utils
 
 
-def run_system_sync(app):
+def run_server_sync(app):
     ret = 8 # rough completion level
 
     share_config = Path(f"/var/lib/samba/usershares/{app.pkg_name}")
@@ -186,7 +186,7 @@ def run_system_sync(app):
 
     return ret
 
-def run_lan_sync(app):
+def run_client_sync(app):
     ret = 9
     # Outline:
     #   - Find LAN sources. (assumes a /24 IPv4 subnet for now)

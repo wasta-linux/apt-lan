@@ -24,7 +24,7 @@ root = Path(__file__).parents[1].resolve()
 if root.name == 'apt-lan':
     sys.path.append(str(root))
 
-from apt_lan import cmd, server, system, utils
+from apt_lan import cmd, server, utils
 
 
 class App(Gtk.Application):
@@ -40,11 +40,11 @@ class App(Gtk.Application):
         )
         self.add_main_option(
             'server-sync', ord('s'), GLib.OptionFlags.NONE, GLib.OptionArg.NONE,
-            'Synchronize APT archive with apt-lan archive.', None
+            "Update apt-lan archive with system's APT archive.", None
         )
         self.add_main_option(
             'client-sync', ord('c'), GLib.OptionFlags.NONE, GLib.OptionArg.NONE,
-            "Synchronize LAN systems' apt-lan archives with this systems' apt-lan archive.", None
+            "Update apt-lan archive with LAN systems' apt-lan archives.", None
         )
         self.add_main_option(
             'debug', ord('d'), GLib.OptionFlags.NONE, GLib.OptionArg.NONE,
@@ -122,12 +122,12 @@ class App(Gtk.Application):
         logging.debug(f"runmode = {self.runmode}")
 
         # Run functions for passed option.
-        if 'system-sync' in options:
-            logging.info(f"Starting system packages sync.")
-            ret = cmd.run_system_sync(self)
-        elif 'lan-sync' in options:
-            logging.info(f"Starting LAN packages sync.")
-            ret = cmd.run_lan_sync(self)
+        if 'server-sync' in options:
+            logging.info(f"Starting server packages sync from system.")
+            ret = cmd.run_server_sync(self)
+        elif 'client-sync' in options:
+            logging.info(f"Starting client packages sync from LAN.")
+            ret = cmd.run_client_sync(self)
         else:
             # Unknown options are handled elsewhere.
             ret = 1
