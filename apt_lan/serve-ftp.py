@@ -19,7 +19,7 @@ if 'debug' in args:
 
 # Define share and log paths.
 share_path = sys.argv[1]
-log_file = share_path.parents[0] / 'log' / 'pyftpd.log'
+log_file = share_path.parents[0] / 'pyftpd.log'
 logging.basicConfig(filename=log_file, level=loglevel)
 
 # Start server.
