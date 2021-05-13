@@ -9,8 +9,7 @@ import tempfile
 
 from pathlib import Path
 
-# from apt_lan import client, server, pkgs, utils
-import client, server, pkgs, utils
+from apt_lan import client, server, pkgs, utils
 
 
 def run_server_sync(app):

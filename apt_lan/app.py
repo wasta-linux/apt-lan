@@ -19,16 +19,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, GLib, Gtk
 from pathlib import Path
 
-# Add repo to sys.path if uninstalled.
-# try:
-#     repo = Path(__file__).parents[1].resolve()
-#     if repo.name == 'apt-lan':
-#         sys.path.append(str(repo))
-# except IndexError:
-#     pass
-
-# from apt_lan import cmd, utils
-import cmd, utils
+from apt_lan import cmd, utils
 
 
 class App(Gtk.Application):
