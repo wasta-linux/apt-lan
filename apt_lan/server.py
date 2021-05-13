@@ -2,6 +2,7 @@
 
 import logging
 import os
+import psutil
 import subprocess
 
 from pathlib import Path
@@ -37,12 +38,15 @@ def ensure_smb_setup(file, share_path):
     file.write_text(contents)
     logging.debug(f"smb config written to {str(file)}")
 
-def ensure_ftp_setup(share_path):
+def ensure_ftp_setup(port, share_path):
     """
     Ensure proper setup of FTP server and share.
     """
     share_path.mkdir(parents=True, exist_ok=True)
     script = Path(__file__).parents[0] / 'serve-ftp.py'
+    # TODO: Only start the server if the port is closed.
+    print(psutil.net_connections())
+    exit()
     ftp_proc = subprocess.Popen(
         [script, share_path],
         stdout=subprocess.PIPE,
