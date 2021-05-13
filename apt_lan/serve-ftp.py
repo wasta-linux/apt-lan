@@ -3,6 +3,8 @@
 import logging
 import sys
 
+from pathlib import Path
+
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
@@ -18,7 +20,7 @@ if 'debug' in args:
     args.remove('debug')
 
 # Define share and log paths.
-share_path = sys.argv[1]
+share_path = Path(sys.argv[1])
 log_file = share_path.parents[0] / 'pyftpd.log'
 logging.basicConfig(filename=log_file, level=loglevel)
 
