@@ -26,7 +26,7 @@ logging.basicConfig(filename=log_file, level=loglevel)
 
 # Start server.
 authorizer = DummyAuthorizer()
-authorizer.add_anonymous(share_path, perm="elr")
+authorizer.add_anonymous(str(share_path), perm="elr")
 handler = FTPHandler
 handler.authorizer = authorizer
 # server = FTPServer(("127.0.0.1", 21021), handler)
