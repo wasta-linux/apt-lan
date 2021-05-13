@@ -22,7 +22,7 @@ def get_os_release():
             if 'VERSION_CODENAME' in line:
                 release = line.split('=')[1].strip()
     if not release:
-        print("ERROR: release not found.")
+        logging.error("Release not found.")
         exit(1)
     return release
 
