@@ -62,7 +62,7 @@ def run_server_sync(app):
     logging.debug(f"Packages to copy count: {len(debs_to_copy)}")
     if len(debs_to_copy) == 0:
         # Already up-to-date. Nothing more to do.
-        logging.info('LAN packages already synced.\n')
+        logging.info('Server packages already synced.\n')
         return 0
 
     logging.debug(f"Packages to copy: {', '.join(debs_to_copy)}")
