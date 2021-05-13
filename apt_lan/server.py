@@ -59,4 +59,4 @@ def ensure_ftp_setup(port, share_path):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT
         )
-        logging.debug(f"Started FTP server: {ftp_proc}")
+        logging.info(f"Started FTP server with PID {ftp_proc.pid}")
