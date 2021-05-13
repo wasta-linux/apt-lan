@@ -48,7 +48,7 @@ def ensure_ftp_setup(port, share_path):
     connections = psutil.net_connections()
     wasta_ftp = False
     for c in connections:
-        if c.port == port:
+        if c.laddr.port == port:
             logging.debug(f"FTP check: {c}")
             wasta_ftp = True
             break
