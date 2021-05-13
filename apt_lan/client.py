@@ -18,7 +18,7 @@ def lan_connect(hostname, port):
     socket.setdefaulttimeout(tos)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         result = sock.connect_ex((hostname, port))
-    logging.debug(f"result: {result}")
+    logging.debug(f"result: {result}; {os.strerror(result)}")
     return result == 0
 
 def get_info():
