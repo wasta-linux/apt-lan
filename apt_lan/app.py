@@ -1,9 +1,11 @@
 ''' Main app structure '''
 
 # Required packages:
+#   - python3-pycurl
 #   - python3-smbc
 #   - samba
-#   - smbclient
+#   - smbclient, needed by smbc? (was needed for smbget, which doesn't work well enough)
+#   - python3-pyftpdlib
 
 import gi
 import gzip
@@ -45,14 +47,15 @@ class App(Gtk.Application):
         # Define app-wide variables.
         self.pkg_name = 'apt-lan'
         home = system.get_home()
-        self.apt_lan_dir = Path(home / '.apt-lan')
-        self.log_dir = Path(self.apt_lan_dir / 'log')
+        self.apt_lan_dir = Path(home) / '.apt-lan'
+        self.share_path = self.apt_lan_dir / 'local-cache'
+        self.log_dir = self.apt_lan_dir / 'log'
 
         self.os_rel = system.get_os_release()
         self.arch_d = utils.get_arch_dir_name()
         self.deb_archives = {
             'system': Path('/var/cache/apt/archives'),
-            'lan': Path(self.apt_lan_dir / 'local-cache' / self.os_rel / self.arch_d)
+            'lan': self.share_path / self.os_rel / self.arch_d
         }
 
     def do_startup(self):
