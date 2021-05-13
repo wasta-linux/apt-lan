@@ -49,7 +49,8 @@ def ensure_ftp_setup(port, share_path):
     wasta_ftp = False
     for c in connections:
         if c.laddr.port == port:
-            logging.debug(f"FTP check: {c}")
+            logging.debug(f"FTP server: {c}")
+            logging.info(f"FTP server already running on port {c.laddr.port} with PID {c.pid}")
             wasta_ftp = True
             break
     if not wasta_ftp:
