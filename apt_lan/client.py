@@ -74,7 +74,7 @@ def get_lan_ips(own_ip, netmask, ports):
         duration = t_end - t_start
         logging.debug(f"Search for {ip} lasted {duration} s.")
         if found:
-            logging.debug(f"LAN samba-share IP found: {ip}")
+            logging.debug(f"LAN share IP found: {ip}")
             lan_ips.append(str(ip))
 
     return lan_ips
@@ -143,7 +143,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             # get_smb_uri_curl(uri) # doesn't work with guest access
     elif port == 21021: # Wasta FTP
         ftp = FTP()
-        r = ftp.connect(host=share_ip, port=port)
+        r = ftp.connect(host=share_ip, port=port, timeout=2)
         logging.debug(f"ftp.connect: {r}")
         r = ftp.login()
         logging.debug(f"ftp.login: {r}")

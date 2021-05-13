@@ -213,8 +213,8 @@ def run_client_sync(app):
     #   - List LAN IPs with samba shares.
     #   - Search IPs for shares called "apt-lan"
     lan_ips = client.get_lan_ips(own_ip, netmask, app.ports)
-    logging.info(f"{len(lan_ips)} LAN samba IPs found.")
-    logging.debug(f"LAN samba IPs: {lan_ips}")
+    logging.info(f"{len(lan_ips)} LAN share IPs found.")
+    logging.debug(f"LAN share IPs: {lan_ips}")
     superseded_debs_own = pkgs.get_superseded_debs(dest_dir / 'superseded.txt')
     logging.debug(f"{len(superseded_debs_own)} superseded packages already identified.")
     for ip in lan_ips:
