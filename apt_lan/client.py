@@ -129,7 +129,8 @@ def get_ftp_file(ftp, filename):
 
 def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
     orig_cwd = os.getcwd()
-    os.chdir(dst_dir)
+    if dst_dir:
+        os.chdir(dst_dir)
     uri_parts = share_uri.split('/')
     share_ip = uri_parts[2]
     dir_path = '/'.join(uri_parts[3:])
