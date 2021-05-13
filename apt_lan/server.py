@@ -2,11 +2,9 @@
 
 import logging
 import os
+import subprocess
 
 from pathlib import Path
-from pyftpdlib.authorizers import DummyAuthorizer
-from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.servers import FTPServer
 
 
 def get_userid():
@@ -43,10 +41,7 @@ def ensure_ftp_setup(share_path):
     """
     Ensure proper setup of FTP server and share.
     """
-    authorizer = DummyAuthorizer()
     share_path.mkdir(parents=True, exist_ok=True)
-    authorizer.add_anonymous(str(share_path), perm="elr")
-    handler = FTPHandler
-    handler.authorizer = authorizer
-    server = FTPServer(("127.0.0.1", 21021), handler)
-    server.serve_forever()
+    script = Path(__file__).parents[0] / 'serve-ftp.py'
+    ftp_proc = subprocess.Popen([script, share_path])
+    logging.debug(f"Started FTP server: {ftp_proc}")
