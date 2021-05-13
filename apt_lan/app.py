@@ -20,11 +20,13 @@ from gi.repository import Gio, GLib, Gtk
 from pathlib import Path
 
 # Add repo to sys.path if uninstalled.
-root = Path(__file__).parents[1].resolve()
-if root.name == 'apt-lan':
-    sys.path.append(str(root))
+file = Path(__file__)
+if file.parents[1]:
+    root = Path(__file__).parents[1].resolve()
+    if root.name == 'apt-lan':
+        sys.path.append(str(root))
 
-from apt_lan import cmd, server, utils
+from apt_lan import cmd, utils
 
 
 class App(Gtk.Application):
