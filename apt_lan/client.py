@@ -8,6 +8,18 @@ import socket
 import subprocess
 import time
 
+from ftplib import FTP
+
+
+def lan_connect(hostname, port):
+    logging.debug(f"Connecting to {hostname}:{port}...")
+    timeout = 10 # milliseconds
+    tos = timeout / 1000
+    socket.setdefaulttimeout(tos)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        result = sock.connect_ex((hostname, port))
+    logging.debug(f"result: {result}")
+    return result == 0
 
 def get_info():
     gws = netifaces.gateways()
@@ -43,23 +55,13 @@ def get_info():
                 return lan_ip, netmask
     return None, None
 
-def get_smb_ips(own_ip, netmask):
+def get_lan_ips(own_ip, netmask, ports):
     """
-    Search the local network for IPs with open samba ports.
+    Search the local network for IPs with open share ports.
     """
-    smb_ips = []
-    smb_ports = [139, 445]
-    timeout = 10 # milliseconds
-    tos = timeout / 1000
-    def connect(hostname, port):
-        # logging.debug(f"Connecting to {hostname}:{port}...")
-        socket.setdefaulttimeout(tos)
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            result = sock.connect_ex((hostname, port))
-        logging.debug(f"result: {result}")
-        return result == 0
+    lan_ips = []
 
-    logging.info(f"Checking LAN for IPs with open SMB port {smb_ports[0]}...")
+    logging.info(f"Checking LAN for IPs with open port {ports[0]}...")
     netw = ipaddress.ip_network(f"{own_ip}/{netmask}", strict=False)
     for ip in netw:
         if str(ip) == own_ip:
@@ -67,32 +69,21 @@ def get_smb_ips(own_ip, netmask):
             continue
         # It takes too long to scan 2 ports for every IP, so only scanning :139.
         t_start = time.time()
-        found = connect(str(ip), smb_ports[0])
+        found = lan_connect(str(ip), ports[0])
         t_end = time.time()
         duration = t_end - t_start
         logging.debug(f"Search for {ip} lasted {duration} s.")
         if found:
             logging.debug(f"LAN samba-share IP found: {ip}")
-            smb_ips.append(str(ip))
+            lan_ips.append(str(ip))
 
-    return smb_ips
+    return lan_ips
 
-def get_apt_lan_ips(lan_ips):
-    apt_lan_ips = []
-    share_name = 'apt-lan'
-    ctx = smbc.Context()
-    for ip in lan_ips:
-        uri = f"smb://{ip}"
-        entries = ctx.opendir(uri).getdents()
-        for e in entries:
-            if e.name == share_name:
-                apt_lan_ips.append(ip)
-    return apt_lan_ips
+def get_file_list_from_share(uri, port):
+    if port == 139: # SMB share
+        ctx = smbc.Context()
+    elif port == 21021: # Wasta FTP
 
-def get_files_from_ip(ip, release, arch_dir):
-    share_name = 'apt-lan'
-    ctx = smbc.Context()
-    uri = f"smb://{ip}/{share_name}/{release}/{arch_dir}"
     ip_files = []
     try:
         logging.debug(f"Getting file list from {uri}...")
@@ -131,14 +122,43 @@ def get_smb_uri_curl(uri):
         c.perform()
     c.close()
 
-def get_smb_files_from_share(share_uri, filenames, dst_dir):
+def get_ftp_file(ftp, filename):
+    with open(filename, 'wb') as f:
+        r = ftp.retrbinary(f'RETR {filename}', f.write)
+    logging.debug(f"Get FTP file: {r}")
+
+def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
     orig_cwd = os.getcwd()
     os.chdir(dst_dir)
+    uri_parts = share_uri.split('/')
+    share_ip = uri_parts[2]
+    dir_path = '/'.join(uri_parts[3:])
+    logging.debug(f"Share IP: {share_ip}")
     logging.debug(f"cd to {dst_dir}")
+    if port == 139: # SMB
+        for filename in filenames:
+            uri = f"{share_uri}/{filename}"
+            get_smb_uri_smbget(uri) # doesn't work for files with "%" in URI.
+            # get_smb_uri_curl(uri) # doesn't work with guest access
+    elif port == 21021: # Wasta FTP
+        ftp = FTP()
+        r = ftp.connect(host=share_ip, port=port)
+        logging.debug(f"ftp.connect: {r}")
+        r = ftp.login()
+        logging.debug(f"ftp.login: {r}")
+        r = ftp.cwd(dir_path)
+        logging.debug(f"ftp.cwd: {r}")
+        if filenames == None:
+            # Get file list.
+            names = ftp.retrlines('NLST')
+            logging.debug(names)
+            return names
+        else:
+            # Get files.
+            for filename in filenames:
+                # uri = f"{share_uri}/{filename}"
+                get_ftp_file(ftp, filename)
+        ftp.quit()
 
-    for filename in filenames:
-        uri = f"{share_uri}/{filename}"
-        get_smb_uri_smbget(uri) # doesn't work for files with "%" in URI.
-        # get_smb_uri_curl(uri) # doesn't work with guest access
     os.chdir(orig_cwd)
     logging.debug(f"cd to {orig_cwd}")

@@ -9,15 +9,16 @@ import tempfile
 
 from pathlib import Path
 
-from apt_lan import lan, pkgs, system, utils
+from apt_lan import client, server, pkgs, utils
 
 
 def run_system_sync(app):
     ret = 8 # rough completion level
 
-    smb_share = Path(f"/var/lib/samba/usershares/{app.pkg_name}")
+    share_config = Path(f"/var/lib/samba/usershares/{app.pkg_name}")
     # Ensure that samba share is properly configured.
-    system.ensure_smb_setup(smb_share)
+    # server.ensure_smb_setup(share_config, app.share_path)
+    server.ensure_ftp_setup(app.share_path)
     # Create a list of approved debs to copy from archives to local-cache:
     system_debs = pkgs.list_archive_debs(app.deb_archives.get('system'))
     logging.debug(f"System debs count: {len(system_debs)}")
@@ -181,11 +182,12 @@ def run_system_sync(app):
     # TODO: What do I do about unblocking APT at this point? I don't want to resort
     #   to anything that requires elevated privileges. This would be the only place
     #   they're needed.
-    logging.info("System packages sync complete.")
+    logging.info("System packages sync complete.\n")
 
     return ret
 
 def run_lan_sync(app):
+    ret = 9
     # Outline:
     #   - Find LAN sources. (assumes a /24 IPv4 subnet for now)
     #   - Sync their packages locally.
@@ -197,34 +199,33 @@ def run_lan_sync(app):
 
     # Find LAN sources.
     #   - Discover LAN IPs and subnet.
-    own_ip, netmask = lan.get_info()
+    own_ip, netmask = client.get_info()
+    if not own_ip or not netmask:
+        logging.error(f"LAN details not found; device: {device}, family: {conn_fam}, gateway: {conn_gw}")
+        return ret
 
     # Loop through IPs and copy debs from each one.
     #   - List LAN IPs with samba shares.
     #   - Search IPs for shares called "apt-lan"
-    lan_ips = lan.get_smb_ips(own_ip, netmask)
+    ports = [139, 445] # SMB
+    ports = [21021] # Wasta FTP
+    lan_ips = client.get_lan_ips(own_ip, netmask, ports)
+    logging.info(f"{len(lan_ips)} LAN samba IPs found.")
+    logging.debug(f"LAN samba IPs: {lan_ips}")
     superseded_debs_own = pkgs.get_superseded_debs(dest_dir / 'superseded.txt')
+    logging.debug(f"{len(superseded_debs_own)} superseded packages already identified.")
     for ip in lan_ips:
+        # share_uri = f"smb://{ip}/apt-lan/{app.os_rel}/{app.arch_d}"
+        share_uri = f"ftp://{ip}/local-cache/{app.os_rel}/{app.arch_d}"
         # Get file list from IP address.
-        ip_files = lan.get_files_from_ip(ip, app.os_rel, app.arch_d)
-        share_dir_uri = f"smb://{ip}/apt-lan/{app.os_rel}/{app.arch_d}"
+        ip_files = client.get_file_list_from_share(share_uri, ports[0])
+        logging.debug(f"{len(ip_files)} files found at {ip} for {app.os_rel}, {app.arch_d}.")
 
         # Update superseded_debs list from LAN share.
         if 'superseded.txt' in ip_files[:]:
-            uri = f"{share_dir_uri}/superseded.txt"
             # Use tempdir because smbget file is downloaded to CWD.
             with Path(tempfile.mkdtemp()) as tempdir:
-                orig_cwd = os.getcwd()
-                os.chdir(tempdir)
-                logging.debug(f"cd to {tempdir}")
-                cmd = ['smbget', '--guest', uri]
-                result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                if result.returncode == 0:
-                    logging.debug(f"smbget: {result.stdout}")
-                else:
-                    logging.error(f"smbget: {result.stderr}")
-                os.chdir(orig_cwd)
-                logging.debug(f"cd to {orig_cwd}")
+                client.get_files_from_share(share_uri, ports[0], ["superseded.txt"], tempdir)
                 new_superseded = tempdir / 'superseded.txt'
                 superseded_debs_ip = pkgs.get_superseded_debs(new_superseded)
             ip_files.remove('superseded.txt')
@@ -234,17 +235,9 @@ def run_lan_sync(app):
         superseded_debs_own.sort()
 
         # Get new packages from LAN share.
-        for deb in ip_files:
-            if deb not in local_debs and deb not in superseded_debs:
-                # Copy deb to local folder. HOW???
-                print(f"{deb} needs to be downloaded from {ip}")
-                uri = f"smb://{ip}/apt-lan/{app.os_rel}/{app.arch_d}/{deb}"
-                # $ smbget --guest smb://192.168.200.173/apt-lan/focal/binary-amd64/Packages.gz
-                # curl (but I can't get it to work with guest access. Maybe with the curl module?)
-                cmd = ['smbget', '--guest', uri]
-                res = subprocess.run(cmd)
-                # Check return code...
-
+        debs_to_get = [d for d in ip_files if d not in local_debs and d not in superseded_debs_own]
+        logging.debug(f"Packages to get from {ip}: {debs_to_get}")
+        client.get_files_from_share(share_uri, debs_to_get, dest_dir)
 
     # Take local share off the network while rebuilding cache.
 
@@ -254,4 +247,5 @@ def run_lan_sync(app):
 
     # Put local share back on the network.
 
-    logging.info("LAN packages sync complete.")
+    logging.info("LAN packages sync complete.\n")
+    return ret
