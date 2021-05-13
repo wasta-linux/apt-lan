@@ -218,7 +218,8 @@ def run_lan_sync(app):
         # share_uri = f"smb://{ip}/apt-lan/{app.os_rel}/{app.arch_d}"
         share_uri = f"ftp://{ip}/local-cache/{app.os_rel}/{app.arch_d}"
         # Get file list from IP address.
-        ip_files = client.get_file_list_from_share(share_uri, ports[0])
+        # ip_files = client.get_file_list_from_share(share_uri, ports[0])
+        ip_files = client.get_files_from_share(share_uri, ports[0])
         logging.debug(f"{len(ip_files)} files found at {ip} for {app.os_rel}, {app.arch_d}.")
 
         # Update superseded_debs list from LAN share.

@@ -83,7 +83,7 @@ def get_file_list_from_share(uri, port):
     if port == 139: # SMB share
         ctx = smbc.Context()
     elif port == 21021: # Wasta FTP
-
+        pass
     ip_files = []
     try:
         logging.debug(f"Getting file list from {uri}...")
