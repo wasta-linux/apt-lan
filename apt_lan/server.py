@@ -43,5 +43,9 @@ def ensure_ftp_setup(share_path):
     """
     share_path.mkdir(parents=True, exist_ok=True)
     script = Path(__file__).parents[0] / 'serve-ftp.py'
-    ftp_proc = subprocess.Popen([script, share_path])
+    ftp_proc = subprocess.Popen(
+        [script, share_path],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT
+    )
     logging.debug(f"Started FTP server: {ftp_proc}")
