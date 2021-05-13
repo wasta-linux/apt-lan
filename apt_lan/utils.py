@@ -5,28 +5,31 @@ import platform
 import time
 
 from pathlib import Path
-from apt_lan import system
+from apt_lan import server
 
 
 def set_up_logging(app_name, base_path, loglevel):
     log_path = Path(base_path)
     log_path.mkdir(parents=True, exist_ok=True)
     #shutil.chown(log_path, user=user, group=user)
-    timestamp = time.strftime('%Y-%m-%d-%H%M%S')
-    hostname = system.get_hostname()
-    log_file = f"{timestamp}-{hostname}.log"
+    # timestamp = time.strftime('%Y-%m-%d-%H%M%S')
+    # date = time.strftime('%Y-%m-%d')
+    hostname = server.get_hostname()
+    # log_file = f"{timestamp}-{hostname}.log"
+    log_file = f"apt-lan-{hostname}.log"
     filename = log_path / log_file
     logging.basicConfig(
         filename=filename,
         level=loglevel,
         format='%(asctime)s %(levelname)s: %(message)s',
-        datefmt='%H:%M:%S'
+        datefmt='%Y-%m-%d %H:%M:%S'
     )
     #shutil.chown(filename, user=user, group=user)
     logging.info('='*65)
-    logging.info(f"{timestamp} {hostname} {app_name} started")
+    # logging.info(f"{timestamp} {hostname} {app_name} started")
+    logging.info(f"{app_name} started for {hostname}")
     logging.info('-'*65)
-    print(f"{app_name} log: {filename}")
+    # print(f"{app_name} log: {filename}")
 
 def convert_bytes_to_human(bytes):
     units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']
