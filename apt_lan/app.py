@@ -1,11 +1,13 @@
 ''' Main app structure '''
 
 # Required packages:
+#   - python3-pyftpdlib
+# ---------------------------
 #   - python3-pycurl
 #   - python3-smbc
 #   - samba
 #   - smbclient, needed by smbc? (was needed for smbget, which doesn't work well enough)
-#   - python3-pyftpdlib
+
 
 import gi
 import gzip
@@ -17,7 +19,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, GLib, Gtk
 from pathlib import Path
 
-from apt_lan import cmd, system, utils
+from apt_lan import cmd, server, system, utils
 
 
 class App(Gtk.Application):
@@ -46,12 +48,13 @@ class App(Gtk.Application):
 
         # Define app-wide variables.
         self.pkg_name = 'apt-lan'
-        home = system.get_home()
+        self.hostname = utils.get_hostname()
+        home = utils.get_home()
         self.apt_lan_dir = Path(home) / '.apt-lan'
         self.share_path = self.apt_lan_dir / 'local-cache'
         self.log_dir = self.apt_lan_dir / 'log'
 
-        self.os_rel = system.get_os_release()
+        self.os_rel = utils.get_os_release()
         self.arch_d = utils.get_arch_dir_name()
         self.deb_archives = {
             'system': Path('/var/cache/apt/archives'),
@@ -110,7 +113,7 @@ class App(Gtk.Application):
 
         # Set up logging.
         # TODO: Create '--log' option.
-        utils.set_up_logging(self.pkg_name, self.apt_lan_dir, self.loglevel)
+        utils.set_up_logging(self)
         logging.debug(f"runmode = {self.runmode}")
 
         # Run functions for passed option.

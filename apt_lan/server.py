@@ -9,25 +9,8 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 
 
-def get_home():
-    return Path(os.environ['HOME'])
-
-def get_hostname():
-    return os.uname().nodename
-
 def get_userid():
     return os.getuid()
-
-def get_os_release():
-    release = ''
-    with open('/etc/os-release', 'r') as f:
-        for line in f.readlines():
-            if 'VERSION_CODENAME' in line:
-                release = line.split('=')[1].strip()
-    if not release:
-        logging.error("Release not found.")
-        exit(1)
-    return release
 
 def ensure_smb_setup(file, share_path):
     '''

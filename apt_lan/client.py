@@ -2,8 +2,8 @@ import ipaddress
 import logging
 import netifaces
 import os
-import pycurl
-import smbc
+# import pycurl
+# import smbc
 import socket
 import subprocess
 import time
