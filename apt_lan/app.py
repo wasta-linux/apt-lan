@@ -34,11 +34,11 @@ class App(Gtk.Application):
             'Print apt-lan version number.', None
         )
         self.add_main_option(
-            'system-sync', ord('s'), GLib.OptionFlags.NONE, GLib.OptionArg.NONE,
+            'server-sync', ord('s'), GLib.OptionFlags.NONE, GLib.OptionArg.NONE,
             'Synchronize APT archive with apt-lan archive.', None
         )
         self.add_main_option(
-            'lan-sync', ord('l'), GLib.OptionFlags.NONE, GLib.OptionArg.NONE,
+            'client-sync', ord('c'), GLib.OptionFlags.NONE, GLib.OptionArg.NONE,
             "Synchronize LAN systems' apt-lan archives with this systems' apt-lan archive.", None
         )
         self.add_main_option(
