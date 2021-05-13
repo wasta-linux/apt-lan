@@ -60,6 +60,6 @@ def ensure_ftp_setup(port, share_path, loglevel):
         ftp_proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT
+            # stderr=subprocess.STDOUT
         )
         logging.info(f"Started FTP server with PID {ftp_proc.pid}")
