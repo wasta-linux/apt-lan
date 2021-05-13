@@ -16,10 +16,11 @@ loglevel = logging.INFO
 if 'debug' in args:
     loglevel = logging.DEBUG
     args.remove('debug')
-logging.basicConfig(filename='/var/log/pyftpd.log', level=loglevel)
 
-# Define share path.
+# Define share and log paths.
 share_path = sys.argv[1]
+log_file = share_path.parents[0] / 'log' / 'pyftpd.log'
+logging.basicConfig(filename=log_file, level=loglevel)
 
 # Start server.
 authorizer = DummyAuthorizer()
