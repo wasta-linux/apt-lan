@@ -13,11 +13,16 @@ import gi
 import gzip
 import logging
 import subprocess
-
+import sys
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, GLib, Gtk
 from pathlib import Path
+
+# Add repo to sys.path if uninstalled.
+root = Path(__file__).parents[1]
+if root.name == 'apt-lan':
+    sys.path.append(root)
 
 from apt_lan import cmd, server, system, utils
 
