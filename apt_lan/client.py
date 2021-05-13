@@ -19,7 +19,7 @@ def lan_connect(hostname, port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         result = sock.connect_ex((hostname, port))
     logging.debug(f"result: {result}; {os.strerror(result)}")
-    return result == 0
+    return result == 0 or result == 111
 
 def get_info():
     gws = netifaces.gateways()
