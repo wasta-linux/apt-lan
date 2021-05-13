@@ -38,7 +38,7 @@ def ensure_smb_setup(file, share_path):
     file.write_text(contents)
     logging.debug(f"smb config written to {str(file)}")
 
-def ensure_ftp_setup(port, share_path):
+def ensure_ftp_setup(port, share_path, loglevel):
     """
     Ensure proper setup of FTP server and share.
     """
@@ -54,8 +54,11 @@ def ensure_ftp_setup(port, share_path):
             wasta_ftp = True
             break
     if not wasta_ftp:
+        cmd = [script, share_path]
+        if loglevel == logging.DEBUG:
+            cmd.append('debug')
         ftp_proc = subprocess.Popen(
-            [script, share_path],
+            cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT
         )
