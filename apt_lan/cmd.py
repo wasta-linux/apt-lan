@@ -241,7 +241,7 @@ def run_client_sync(app):
 
         # Rebuild Packages.gz file.
         pkgs.rebuild_pkgs_gz(dest_dir, pkgs_gz, old_pkgs_gz)
-        return 0
+        ret = 0
 
     # Ensure correct Packages.gz file.
     final_debs = pkgs.list_archive_debs(dest_dir)
