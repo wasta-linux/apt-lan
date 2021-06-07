@@ -158,8 +158,10 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
                 logging.error(r.stderr)
                 exit()
             lines = logging.info(r.stdout).readlines()
-            files = [l.split()[-1] for l in lines]
-            print(files)
+            files = [l.split()[-1].split('/') for l in lines]
+            logging.debug(f"File list:")
+            for f in files:
+                logging.debug(f"  {f}")
             return files
         else:
             # Get files.
