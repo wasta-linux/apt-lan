@@ -164,11 +164,11 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
         else:
             # Update rsync command & ensure destination exists.
             dest = dst_dir / dir_path
-            cmd.append(dest)
+            cmd.append(str(dest))
             dest.mkdir(parents=True, exist_ok=True)
             # Get files.
             for filename in filenames:
-                cmd[2] = str(cmd[2] + filename)
+                cmd[2] = cmd[2] + filename
                 r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 logging.debug(f"cmd: {' '.join(r.args)}")
                 if r.returncode != 0:
