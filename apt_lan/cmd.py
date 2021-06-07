@@ -223,7 +223,6 @@ def run_client_sync(app):
             for deb in superseded_debs_own:
                 f.write(f"{deb}\n")
         logging.debug(f"Superseded packages file: {superseded_debs_file}.")
-        # logging.info(f"{len(kept_debs)} packages in apt-lan cache. {len(superseded_debs_own)} others are listed as obsolete. {len(removed_debs)} were removed.")
 
         # Rename Packages.gz file (if it exists) during file changes.
         if pkgs_gz.is_file():

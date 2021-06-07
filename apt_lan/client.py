@@ -177,7 +177,6 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             if r.returncode != 0:
                 logging.error(f"Failed to copy packages:")
                 logging.error(r.stdout)
-            logging.info(r.stdout)
 
     os.chdir(orig_cwd)
     logging.debug(f"cd to {orig_cwd}")
