@@ -21,6 +21,7 @@ sys.path.append(modules_dir)
 from apt_lan import app
 
 if __name__ == '__main__':
-    app.app.runmode = runmode
-    status = app.app.run(sys.argv)
+    myapp = app.App()
+    myapp.runmode = runmode
+    status = myapp.run(sys.argv)
     sys.exit(status)

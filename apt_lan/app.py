@@ -10,8 +10,8 @@ import logging
 import subprocess
 import sys
 
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gio, GLib, Gtk
+# gi.require_version("Gtk", "3.0")
+# from gi.repository import Gio, GLib, Gtk
 from pathlib import Path
 
 from apt_lan import cmd, utils
@@ -123,5 +123,32 @@ class App(Gtk.Application):
             ret = 1
 
         return ret
+
+class App():
+    def __init__(self, *args):
+        self.cmdline = args
+
+        # Define app-wide variables.
+        self.pkg_name = 'apt-lan'
+        self.hostname = utils.get_hostname()
+        # home = utils.get_home()
+        self.apt_lan_dir = Path('/var/cache/apt-lan')
+        # self.share_path = self.apt_lan_dir / 'local-cache'
+        self.share_path = self.apt_lan_dir
+        # self.log_dir = self.apt_lan_dir / 'log'
+        self.log_dir = Path('/var/log/apt-lan')
+
+        self.os_rel = utils.get_os_release()
+        self.arch_d = utils.get_arch_dir_name()
+        self.deb_archives = {
+            'system': Path('/var/cache/apt/archives'),
+            'lan': self.share_path / self.os_rel / self.arch_d
+        }
+        self.ports = [139, 445] # SMB
+        self.ports = [21021] # Wasta FTP
+        self.ports = [22022] # Wasta rsyncd
+
+    def run(self.cmdline):
+        print(self.cmdline)
 
 app = App()
