@@ -172,6 +172,52 @@ class App():
         )
 
         args = parser.parse_args()
-        print(args)
 
-# app = App()
+        if not args:
+            # No command line args passed: print version? print help?.
+            parser.print_help()
+            return 1
+
+        if args.version:
+            chlog = Path(f"/usr/share/{self.pkg_name}/changelog.gz")
+            fmt = 'gz'
+            if self.runmode == 'uninstalled':
+                chlog = Path(f"../debian/changelog")
+                fmt = 'txt'
+            # TODO: need to parse top line of changelog file.
+            try:
+                chlog.stat()
+            except FileNotFoundError:
+                print('0.0')
+                return 0
+
+            if fmt == 'gz':
+                # TODO: This needs to be tested.
+                contents = gzip.decompress(chlog.read_bytes())
+                head = f.read().splitlines()[0]
+                print(head)
+            else:
+                with open(chlog) as f:
+                    head = f.read().splitlines()[0]
+                    print(head)
+            return 0
+
+        # Set log level.
+        self.loglevel = logging.DEBUG if args.debug else logging.INFO
+
+        # Set up logging.
+        utils.set_up_logging(self)
+        logging.debug(f"runmode = {self.runmode}")
+
+        # Run functions for passed option.
+        if args.server_sync:
+            logging.info(f"Starting server packages sync from system.")
+            ret = cmd.run_server_sync(self)
+        elif args.client_sync:
+            logging.info(f"Starting client packages sync from LAN.")
+            ret = cmd.run_client_sync(self)
+        else:
+            # Unknown options are handled elsewhere.
+            ret = 1
+
+        return ret
