@@ -44,13 +44,12 @@ class App(Gtk.Application):
         # Define app-wide variables.
         self.pkg_name = 'apt-lan'
         self.hostname = utils.get_hostname()
-        home = utils.get_home()
-        # TODO: Change to use system locations:
-        #   - /var/log/apt-lan.log
-        #   - /var/cache/apt-lan
+        # home = utils.get_home()
         self.apt_lan_dir = Path('/var/cache/apt-lan')
-        self.share_path = self.apt_lan_dir / 'local-cache'
-        self.log_dir = self.apt_lan_dir / 'log'
+        # self.share_path = self.apt_lan_dir / 'local-cache'
+        self.share_path = self.apt_lan_dir
+        # self.log_dir = self.apt_lan_dir / 'log'
+        self.log_dir = Path('/var/log/apt-lan')
 
         self.os_rel = utils.get_os_release()
         self.arch_d = utils.get_arch_dir_name()

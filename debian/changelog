@@ -1,0 +1,5 @@
+apt-lan (0.1) focal; urgency=medium
+
+  * Initial release.
+
+ -- Nate Marti <nate_marti@sil.org>  Mon, 07 Jun 2021 09:51:00 +0100

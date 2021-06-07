@@ -26,8 +26,8 @@ def get_hostname():
     return os.uname().nodename
 
 def set_up_logging(app):
-    log_path = Path(app.apt_lan_dir)
-    log_path.mkdir(parents=True, exist_ok=True)
+    log_path = Path(app.log_dir)
+    # log_path.mkdir(parents=True, exist_ok=True) # created during package install with mod=666
     log_file = f"{app.pkg_name}-{app.hostname}.log"
     file_path = log_path / log_file
     logging.basicConfig(
