@@ -205,7 +205,7 @@ def run_client_sync(app):
             logging.info(f"Another sync is in progress at {ip}. Skipping.")
             return 2
         # Update superseded_debs list from LAN share.
-        superseded_debs = []
+        superseded_debs_ip = []
         if 'superseded.txt' in ip_files[:]:
             # Use tempdir because file will be downloaded to CWD.
             with Path(tempfile.mkdtemp()) as tempdir:
