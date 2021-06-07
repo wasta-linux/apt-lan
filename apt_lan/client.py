@@ -152,6 +152,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             if r.returncode != 0:
                 logging.error(f"Failed to get file list:")
+                logging.error(r.stdout)
                 logging.error(r.stderr)
                 exit()
             lines = r.stdout.splitlines()
