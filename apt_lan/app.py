@@ -173,7 +173,7 @@ class App():
 
         args = parser.parse_args()
 
-        if not args:
+        if len(args) == 1:
             # No command line args passed: print version? print help?.
             parser.print_help()
             return 1
