@@ -168,10 +168,13 @@ def run_client_sync(app):
     #   - Rebuild local Packages.gz
 
     # Ensure that share folder exists.
-    app.share_path.mkdir(parents=True, exist_ok=True)
-
     dest_dir = app.deb_archives.get('lan')
+    dest_dir.mkdir(parents=True, exist_ok=True)
+
+    # Get current packages list.
     local_debs = pkgs.list_archive_debs(dest_dir)
+
+    # Define Packages.gz file names.
     pkgs_gz = dest_dir / 'Packages.gz'
     old_pkgs_gz = dest_dir / 'Packages.gz.old'
 
