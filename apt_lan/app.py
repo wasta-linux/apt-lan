@@ -125,9 +125,7 @@ from apt_lan import cmd, utils
 #         return ret
 
 class App():
-    def __init__(self, *args):
-        self.cmdline = args
-
+    def __init__(self):
         # Define app-wide variables.
         self.pkg_name = 'apt-lan'
         self.hostname = utils.get_hostname()
@@ -148,7 +146,8 @@ class App():
         self.ports = [21021] # Wasta FTP
         self.ports = [22022] # Wasta rsyncd
 
-    def run(self):
+    def run(self, *args):
+        self.cmdline = args
         print(self.cmdline)
 
 app = App()
