@@ -145,10 +145,10 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
         ftp.quit()
 
     elif port == 22022: # Wasta rsync
-        cmd = ['rsync', f'--port={port}', f'{share_uri}/', f'{dst_dir}/{dir_path}']
+        cmd = ['rsync', f'--port={port}']
         if filenames == None:
             # Get file list.
-            cmd.append('--list-only')
+            cmd.extend(['--list-only', f'{share_uri}/'])
             r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             logging.debug(f"cmd: {' '.join(r.args)}")
             if r.returncode != 0:
@@ -163,6 +163,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             return files
         else:
             # Get files.
+            cmd.extend([f'{share_uri}/', f'{dst_dir}/{dir_path}'])
             for filename in filenames:
                 cmd[2] = f"{cmd[2]}{filename}"
                 r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
