@@ -1,0 +1,17 @@
+Source: apt-lan
+Section: utils
+Priority: optional
+Maintainer: Nate Marti <nate_marti@sil.org>
+Build-Depends:
+ debhelper (>= 11.0.0),
+ dh-systemd
+Standards-Version: 4.4.0
+Homepage: https://github.com/wasta-linux/apt-lan
+
+Package: apt-lan
+Architecture: all
+Depends:
+ rsync,
+ ${misc:Depends}
+
+Description: Share curated debian packages over the LAN for easy updates.

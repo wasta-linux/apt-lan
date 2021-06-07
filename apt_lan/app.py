@@ -47,8 +47,8 @@ class App(Gtk.Application):
         home = utils.get_home()
         # TODO: Change to use system locations:
         #   - /var/log/apt-lan.log
-        #   - /var/ftp/apt-lan/
-        self.apt_lan_dir = Path(home) / '.apt-lan'
+        #   - /var/cache/apt-lan
+        self.apt_lan_dir = Path('/var/cache/apt-lan')
         self.share_path = self.apt_lan_dir / 'local-cache'
         self.log_dir = self.apt_lan_dir / 'log'
 
@@ -60,6 +60,7 @@ class App(Gtk.Application):
         }
         self.ports = [139, 445] # SMB
         self.ports = [21021] # Wasta FTP
+        self.ports = [22022] # Wasta rsyncd
 
     def do_startup(self):
         Gtk.Application.do_startup(self)

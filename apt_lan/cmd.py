@@ -16,7 +16,8 @@ def run_server_sync(app):
 
     share_config = Path(f"/var/lib/samba/usershares/{app.pkg_name}")
     # Ensure that file share is properly configured.
-    server.ensure_ftp_setup(app.ports[0], app.share_path, app.loglevel)
+    # server.ensure_ftp_setup(app.ports[0], app.share_path, app.loglevel)
+    server.ensure_rsyncd_setup(app.ports[0], app.share_path, app.loglevel)
 
     # Create a list of approved debs to copy from archives to local-cache:
     system_debs = pkgs.list_archive_debs(app.deb_archives.get('system'))
