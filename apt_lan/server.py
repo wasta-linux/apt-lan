@@ -80,9 +80,12 @@ def ensure_rsyncd_setup(port, share_path, loglevel):
             rsyncd = True
             break
     if not rsyncd:
-        cmd = ['pkexec', 'systemctl', 'enable', '--now', 'rsyncd.service']
+        cmd = ['pkexec', 'systemctl', 'enable', '--now', 'apt-lan-rsyncd.service']
         if loglevel == logging.DEBUG:
             # cmd.append('debug')
             pass
         r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        logging.info(f"Started rsyncd with PID {r.pid}")
+        if r.returncode == 0:
+            logging.info(f"Started rsyncd with PID {r.pid}")
+        else:
+            logging.error(f"Failed to start apt-lan-rsyncd.service.")
