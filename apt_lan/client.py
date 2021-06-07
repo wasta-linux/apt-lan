@@ -145,11 +145,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
         ftp.quit()
 
     elif port == 22022: # Wasta rsync
-        cmd = [
-            'rsync', '--recursive', f'--port={port}',
-            f'rsync://{share_ip}/apt-lan/',
-            f'{dst_dir}/{dir_path}',
-        ]
+        cmd = ['rsync', f'--port={port}', f'{share_uri}/', f'{dst_dir}/{dir_path}']
         if filenames == None:
             # Get file list.
             cmd.append('--list-only')
@@ -167,6 +163,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
         else:
             # Get files.
             for filename in filenames:
+                cmd[2] = f"{cmd[2]}{filename}"
                 r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 if r.returncode != 0:
                     logging.error(f"Failed to copy packages:")
