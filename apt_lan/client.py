@@ -104,6 +104,7 @@ def get_ftp_file(ftp, filename):
 
 def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
     orig_cwd = os.getcwd()
+    logging.debug(f"share_uri: {share_uri}")
     if dst_dir:
         os.chdir(dst_dir)
         logging.debug(f"cd to {dst_dir}")
@@ -145,7 +146,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
 
     elif port == 22022: # Wasta rsync
         cmd = [
-            'rsync', '--recursive', '--update', f'--port={port}',
+            'rsync', '--recursive', f'--port={port}',
             f'rsync://{share_ip}/apt-lan/',
             f'{dst_dir}/{dir_path}',
         ]
@@ -165,11 +166,12 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             return files
         else:
             # Get files.
-            r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            if r.returncode != 0:
-                logging.error(f"Failed to copy packages:")
-                logging.error(r.stderr)
-            logging.info(r.stdout)
+            for filename in filenames:
+                r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                if r.returncode != 0:
+                    logging.error(f"Failed to copy packages:")
+                    logging.error(r.stderr)
+                logging.info(r.stdout)
 
     os.chdir(orig_cwd)
     logging.debug(f"cd to {orig_cwd}")
