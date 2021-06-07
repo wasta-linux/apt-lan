@@ -36,11 +36,11 @@ def set_up_logging(app):
         format='%(asctime)s %(levelname)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-    #shutil.chown(filename, user=user, group=user)
-    logging.info('='*65)
+    ct = 54
+    logging.info('=' * ct)
     # logging.info(f"{timestamp} {hostname} {app_name} started")
     logging.info(f"{app.pkg_name} started for {app.hostname}")
-    logging.info('-'*65)
+    logging.info('-' * ct)
 
 def convert_bytes_to_human(bytes):
     units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']
