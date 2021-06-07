@@ -168,7 +168,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             dest.mkdir(parents=True, exist_ok=True)
             # Get files.
             for filename in filenames:
-                cmd[2] = f"{cmd[2]}{filename}"
+                cmd[2] = str(cmd[2] + filename)
                 r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 logging.debug(f"cmd: {' '.join(r.args)}")
                 if r.returncode != 0:
