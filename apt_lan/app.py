@@ -157,14 +157,17 @@ class App():
         )
         parser.add_argument(
             '--server-sync', '-s',
+            action='store_true',
             help="Update apt-lan archive with system's APT archive.",
         )
         parser.add_argument(
             '--client-sync', '-c',
+            action='store_true',
             help="Update apt-lan archive with LAN systems' apt-lan archives."
         )
         parser.add_argument(
             '--debug', '-d',
+            action='store_true',
             help="Log debug output."
         )
 
