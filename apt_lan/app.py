@@ -146,8 +146,28 @@ class App():
         self.ports = [21021] # Wasta FTP
         self.ports = [22022] # Wasta rsyncd
 
-    def run(self, *args):
-        self.cmdline = args
-        print(self.cmdline)
+    def run(self, cmdline):
+        self.cmdline = cmdline
 
-app = App()
+        parser = argparse.ArgumentParser()
+        parser.add_argument(
+            '--version', '-V',
+            help='Print apt-lan version number.',
+        )
+        parser.add_argument(
+            '--server-sync', '-s',
+            help="Update apt-lan archive with system's APT archive.",
+        )
+        parser.add_argument(
+            '--client-sync', '-c',
+            help="Update apt-lan archive with LAN systems' apt-lan archives."
+        )
+        parser.add_argument(
+            '--debug', '-d',
+            help="Log debug output."
+        )
+
+        args = parser.parse_args()
+        print(args)
+
+# app = App()
