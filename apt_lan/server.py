@@ -84,5 +84,5 @@ def ensure_rsyncd_setup(port, share_path, loglevel):
         if loglevel == logging.DEBUG:
             # cmd.append('debug')
             pass
-        r = supbrocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         logging.info(f"Started rsyncd with PID {r.pid}")
