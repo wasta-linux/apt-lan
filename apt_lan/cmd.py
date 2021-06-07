@@ -192,6 +192,7 @@ def run_client_sync(app):
     logging.info(f"{len(share_ips)} LAN share IPs found.")
     logging.debug(f"LAN share IPs: {share_ips}")
     superseded_debs_file = dest_dir / 'superseded.txt'
+    superseded_debs_file.touch(exist_ok=True)
     superseded_debs_own = pkgs.get_superseded_debs(superseded_debs_file)
     logging.debug(f"{len(superseded_debs_own)} superseded packages already identified.")
     for ip in share_ips:
