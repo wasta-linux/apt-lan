@@ -157,7 +157,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
                 logging.error(f"Failed to get file list:")
                 logging.error(r.stderr)
                 exit()
-            lines = logging.info(r.stdout).readlines()
+            lines = r.stdout.readlines()
             files = [l.split()[-1].split('/') for l in lines]
             logging.debug(f"File list:")
             for f in files:
