@@ -151,7 +151,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
         ]
         if filenames == None:
             # Get file list.
-            cmd = cmd.append('--dry-run')
+            cmd.append('--dry-run')
             r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if r.returncode != 0:
                 logging.error(f"Failed to get file list:")
