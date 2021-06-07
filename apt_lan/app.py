@@ -148,7 +148,7 @@ class App():
         self.ports = [21021] # Wasta FTP
         self.ports = [22022] # Wasta rsyncd
 
-    def run(self.cmdline):
+    def run(self):
         print(self.cmdline)
 
 app = App()
