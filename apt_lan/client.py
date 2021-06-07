@@ -150,10 +150,10 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             # Get file list.
             cmd.append('--list-only')
             r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            logging.debug(f"cmd: {' '.join(r.args)}")
             if r.returncode != 0:
                 logging.error(f"Failed to get file list:")
                 logging.error(r.stdout)
-                logging.error(r.stderr)
                 exit()
             lines = r.stdout.splitlines()
             files = [l.split()[-1].split('/') for l in lines]
@@ -166,9 +166,10 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             for filename in filenames:
                 cmd[2] = f"{cmd[2]}{filename}"
                 r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                logging.debug(f"cmd: {' '.join(r.args)}")
                 if r.returncode != 0:
                     logging.error(f"Failed to copy packages:")
-                    logging.error(r.stderr)
+                    logging.error(r.stdout)
                 logging.info(r.stdout)
 
     os.chdir(orig_cwd)
