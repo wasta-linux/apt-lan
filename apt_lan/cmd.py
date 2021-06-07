@@ -12,10 +12,10 @@ from apt_lan import client, server, pkgs, utils
 
 
 def run_server_sync(app):
-    ret = 8 # rough completion level
+    # share_config = Path(f"/var/lib/samba/usershares/{app.pkg_name}")
 
-    share_config = Path(f"/var/lib/samba/usershares/{app.pkg_name}")
     # Ensure that file share is properly configured.
+    app.share_path.mkdir(parents=True, exist_ok=True)
     # server.ensure_ftp_setup(app.ports[0], app.share_path, app.loglevel)
     server.ensure_rsyncd_setup(app.ports[0], app.share_path, app.loglevel)
 
@@ -41,7 +41,6 @@ def run_server_sync(app):
     logging.debug(f"LAN archive space: {dest_free_human.get('Number'):5.1f} {dest_free_human.get('Unit')}")
     logging.debug(f"LAN archive package count: {len(dest_debs)}")
     logging.debug(f"LAN archive packages: {', '.join(dest_debs)}")
-    ret = 7
 
     # Remove debs already in destination from copy list.
     debs_to_copy = pkgs.list_debs_to_copy(approved_debs, dest_debs)
@@ -65,7 +64,6 @@ def run_server_sync(app):
         return 0
 
     logging.debug(f"Packages to copy: {', '.join(debs_to_copy)}")
-    ret = 6
 
     copy_bytes = 0
     for deb in debs_to_copy:
@@ -80,7 +78,7 @@ def run_server_sync(app):
     # Ensure at least 100 MB of space left after copy.
     if dest_bytes_free - 100000000 < copy_bytes:
         logging.error(f"{ch.get('Number'):5.1f} {ch.get('Unit')} to copy, but only {dh.get('Number'):5.1f} {dh.get('Unit')} available in {dest_dir}")
-        return ret
+        return 1
 
     # Log the copy details.
     ct = len(debs_to_copy)
@@ -97,7 +95,6 @@ def run_server_sync(app):
             copied = shutil.copy(src_file, dest_dir)
             debs_copied.append(copied)
     os.sync()
-    ret = 5
 
     # Delay the script if another sync is in progress.
     old_pkgs_gz = dest_dir / 'Packages.gz.old'
@@ -122,7 +119,6 @@ def run_server_sync(app):
             deb = line.split(':')[1].strip().split('/')[-1]
             kept_debs.append(deb)
             logging.debug(f"{deb} added to list of kept packages.")
-    ret = 4
 
     # List i386 packages to keep.
     logging.info("Listing i386 packages to be kept...")
@@ -136,7 +132,6 @@ def run_server_sync(app):
             deb = line.split(':')[1].strip().split('/')[-1]
             kept_debs.append(deb)
             logging.debug(f"{deb} added to list of kept packages.")
-    ret = 3
 
     # Remove non-kept packages.
     removed_debs = []
@@ -151,7 +146,6 @@ def run_server_sync(app):
             file.unlink()
             logging.debug(f"{file} removed from LAN cache.")
     superseded_debs.sort()
-    ret = 2
 
     # Update superseded_debs_file.
     with open(superseded_debs_file, 'w') as f:
@@ -159,21 +153,22 @@ def run_server_sync(app):
             f.write(f"{deb}\n")
     logging.debug(f"Superseded packages file: {superseded_debs_file}.")
     logging.info(f"{len(kept_debs)} packages in apt-lan cache. {len(superseded_debs)} others are listed as obsolete. {len(removed_debs)} were removed.")
-    ret = 1
 
     # Rebuild Packages.gz file.
     pkgs.rebuild_pkgs_gz(dest_dir, pkgs_gz, old_pkgs_gz)
 
     logging.info("System packages sync complete.\n")
-    return ret
+    return 0
 
 def run_client_sync(app):
-    ret = 9
     # Outline:
     #   - Find LAN sources. (assumes IPv4 for now)
     #   - Sync their packages locally.
     #       - only same release and arch
     #   - Rebuild local Packages.gz
+
+    # Ensure that share folder exists.
+    app.share_path.mkdir(parents=True, exist_ok=True)
 
     dest_dir = app.deb_archives.get('lan')
     local_debs = pkgs.list_archive_debs(dest_dir)
@@ -184,7 +179,7 @@ def run_client_sync(app):
     own_ip, netmask = client.get_info()
     if not own_ip or not netmask:
         logging.error(f"LAN details not found; device: {device}, family: {conn_fam}, gateway: {conn_gw}")
-        return ret
+        return 1
 
     # Loop through LAN IPs and copy debs from each one.
     #   - List LAN IPs with correct port open.
@@ -204,7 +199,7 @@ def run_client_sync(app):
         # Skip this server if another sync is in progress there.
         if 'Packages.gz.old' in ip_files:
             logging.info(f"Another sync is in progress at {ip}. Skipping.")
-            return 2
+            return 1
         # Update superseded_debs list from LAN share.
         superseded_debs_ip = []
         if 'superseded.txt' in ip_files[:]:
@@ -242,7 +237,6 @@ def run_client_sync(app):
 
         # Rebuild Packages.gz file.
         pkgs.rebuild_pkgs_gz(dest_dir, pkgs_gz, old_pkgs_gz)
-        ret = 0
 
     # Ensure correct Packages.gz file.
     final_debs = pkgs.list_archive_debs(dest_dir)
@@ -255,4 +249,4 @@ def run_client_sync(app):
         pkgs.rebuild_pkgs_gz(dest_dir, pkgs_gz, old_pkgs_gz)
 
     logging.info("LAN packages sync complete.\n")
-    return ret
+    return 0

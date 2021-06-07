@@ -68,8 +68,6 @@ def ensure_rsyncd_setup(port, share_path, loglevel):
     """
     Ensure proper setup of rsyncd server and share.
     """
-    # Ensure share folder exists.
-    share_path.mkdir(parents=True, exist_ok=True)
     # Ensure rsyncd is running.
     connections = psutil.net_connections()
     rsyncd = False
