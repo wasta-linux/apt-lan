@@ -153,6 +153,7 @@ class App():
         parser = argparse.ArgumentParser()
         parser.add_argument(
             '--version', '-V',
+            action='store_true',
             help='Print apt-lan version number.',
         )
         parser.add_argument(
@@ -172,9 +173,8 @@ class App():
         )
 
         args = parser.parse_args()
-        # args_list = [args.version, args.server_sync, args.client_sync]
         if not any([args.version, args.server_sync, args.client_sync]):
-            # No command line args passed: print version? print help?.
+            # No command line args passed.
             parser.print_help()
             return 1
 
