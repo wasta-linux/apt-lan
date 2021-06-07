@@ -167,14 +167,15 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             src_dir = cmd[2]
 
             # Get files.
-            for filename in filenames:
-                cmd[2] = src_dir + filename
-                r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                logging.debug(f"cmd: {' '.join(r.args)}")
-                if r.returncode != 0:
-                    logging.error(f"Failed to copy packages:")
-                    logging.error(r.stdout)
-                logging.info(r.stdout)
+            if len(filenames) == 1:
+                # Source is only one specific file (superseded.txt).
+                cmd[2] = src_dir + filenames[0]
+            r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            logging.debug(f"cmd: {' '.join(r.args)}")
+            if r.returncode != 0:
+                logging.error(f"Failed to copy packages:")
+                logging.error(r.stdout)
+            logging.info(r.stdout)
 
     os.chdir(orig_cwd)
     logging.debug(f"cd to {orig_cwd}")
