@@ -172,7 +172,8 @@ class App():
         )
 
         args = parser.parse_args()
-        if not any(list(args)):
+        # args_list = [args.version, args.server_sync, args.client_sync]
+        if not any([args.version, args.server_sync, args.client_sync]):
             # No command line args passed: print version? print help?.
             parser.print_help()
             return 1
