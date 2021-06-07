@@ -149,7 +149,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             f'rsync://{share_ip}/apt-lan/',
             f'{dst_dir}/{dir_path}',
         ]
-        r = subprocess.run(cmd, stdout=supbrocess.PIPE, stderr=subprocess.STDOUT)
+        r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if r.returncode != 0:
             logging.error(f"Failed to copy packages:")
             logging.error(r.stderr)
