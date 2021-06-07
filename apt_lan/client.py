@@ -164,8 +164,8 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
         else:
             # Update rsync command & ensure destination exists.
             dest = dst_dir / dir_path
-            cmd.append(str(dest))
-            dest.mkdir(parents=True, exist_ok=True)
+            cmd.append(str(dst_dir))
+            # dest.mkdir(parents=True, exist_ok=True)
             # Get files.
             for filename in filenames:
                 cmd[2] = cmd[2] + filename
