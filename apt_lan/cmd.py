@@ -195,7 +195,7 @@ def run_client_sync(app):
     logging.debug(f"{len(superseded_debs_own)} superseded packages already identified.")
     for ip in share_ips:
         share_uri = f"ftp://{ip}/{app.os_rel}/{app.arch_d}"
-        share_uri = f"rsync://{ip}/{app.os_rel}/{app.arch_d}"
+        share_uri = f"rsync://{ip}/apt-lan/{app.os_rel}/{app.arch_d}"
         # Get file list from IP address.
         ip_files = client.get_files_from_share(share_uri, app.ports[0])
         logging.info(f"{len(ip_files)} files found at {ip} for {app.os_rel}/{app.arch_d}.")
