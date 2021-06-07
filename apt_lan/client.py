@@ -149,11 +149,24 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             f'rsync://{share_ip}/apt-lan/',
             f'{dst_dir}/{dir_path}',
         ]
-        r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        if r.returncode != 0:
-            logging.error(f"Failed to copy packages:")
-            logging.error(r.stderr)
-        logging.info(r.stdout)
+        if filenames == None:
+            # Get file list.
+            cmd = cmd.append('--dry-run')
+            r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if r.returncode != 0:
+                logging.error(f"Failed to get file list:")
+                logging.error(r.stderr)
+                return
+            files = logging.info(r.stdout).readlines()
+            print(files)
+            return files
+        else:
+            # Get files.
+            r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if r.returncode != 0:
+                logging.error(f"Failed to copy packages:")
+                logging.error(r.stderr)
+            logging.info(r.stdout)
 
     os.chdir(orig_cwd)
     logging.debug(f"cd to {orig_cwd}")
