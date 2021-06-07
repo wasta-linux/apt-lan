@@ -170,6 +170,8 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             if len(filenames) == 1:
                 # Source is only one specific file (superseded.txt).
                 cmd[2] = src_dir + filenames[0]
+            else:
+                cmd.append('--recursive')
             r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             logging.debug(f"cmd: {' '.join(r.args)}")
             if r.returncode != 0:
