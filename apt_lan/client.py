@@ -145,19 +145,20 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
 
     elif port == 22022: # Wasta rsync
         cmd = [
-            'rsync', '--verbose', '--recursive', '--update',
+            'rsync', '--recursive', '--update', f'--port={port}',
             f'rsync://{share_ip}/apt-lan/',
             f'{dst_dir}/{dir_path}',
         ]
         if filenames == None:
             # Get file list.
-            cmd.append('--dry-run')
+            cmd.append('--list-only')
             r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if r.returncode != 0:
                 logging.error(f"Failed to get file list:")
                 logging.error(r.stderr)
-                return
-            files = logging.info(r.stdout).readlines()
+                exit()
+            lines = logging.info(r.stdout).readlines()
+            files = [l.split()[-1] for l in lines]
             print(files)
             return files
         else:
