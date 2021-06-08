@@ -8,6 +8,10 @@ import time
 from pathlib import Path
 
 
+def apply_config(app):
+    print("Config:")
+    print(app.config)
+
 def get_os_release():
     release = ''
     with open('/etc/os-release', 'r') as f:
@@ -42,12 +46,73 @@ def get_pkg_root(app):
         pkg_root = app.exe_path.parents[1] / 'share' / app.pkg_name
     return pkg_root
 
+def get_config(app):
+    # Initialize config dictionary.
+    config = {
+        # 'network': {},
+        # 'repositories': [],
+        # 'system': {},
+    }
+
+    # Get config root directory.
+    if str(app.pkg_root.parent) == '/usr/share':
+        # Installed package. Config in /etc/.
+        config_root = Path('/etc')
+    else:
+        # Assume git package. Config in ./{app.pkg_root}/data/.
+        config_root = Path(app.pkg_root) / 'data'
+    logging.debug(f"Config root: {config_root}")
+
+    config_lines = []
+    # Get lines from config file.
+    config_file = config_root / f"{app.pkg_name}.conf"
+    with config_file.open() as c:
+        logging.debug(f"Reading config from {config_file}")
+        config_lines.extend(c.readlines())
+
+    # Get lines from config directory files.
+    config_dir = config_root / f"{app.pkg_name}.conf.d"
+    for f in config_dir.iterdir():
+        with f.open() as c:
+            logging.debug(f"Reading config from {f}")
+            config_lines.extend(c.readlines())
+
+    # Parse lines into config dictionary.
+    line = 0
+    for l in config_lines:
+        l = l.strip() # remove whitespace & newlines
+        logging.debug(f"line: {l}")
+        line += 1
+        if l:
+            if l[0] == '#': # skip commented line
+                continue
+            elif l[0] == '[': # section header
+                section = l[1:-1]
+                if section == 'repositories':
+                    config[section] = []
+                else:
+                    config[section] = {}
+                continue
+
+            parts = l.split('=')
+            parts = [p.strip() for p in parts]
+            if section == 'repositories':
+                config[section].append(l)
+            else:
+                config[section][parts[0]] = parts[1]
+        else:
+            section = None
+
+    logging.debug('Full config:')
+    logging.debug(config)
+    return config
 
 def set_up_logging(app):
     log_path = Path(app.log_dir)
     # log_path.mkdir(parents=True, exist_ok=True) # created during package install with mod=666
     log_file = f"{app.pkg_name}.log"
     file_path = log_path / log_file
+    print(f"Log file: {file_path}")
     logging.basicConfig(
         filename=file_path,
         level=app.loglevel,

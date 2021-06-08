@@ -40,6 +40,9 @@ class App():
     def run(self, cmdline):
         self.exe_path = Path(cmdline[0]).resolve()
         self.pkg_root = utils.get_pkg_root(self)
+        self.config = utils.get_config(self)
+        # TODO: Enable "apply config".
+        utils.apply_config(self)
 
         # Define options.
         parser = argparse.ArgumentParser()
@@ -97,10 +100,8 @@ class App():
             print(f"{parts[0]} {version}")
             return 0
 
-        # Set log level.
-        self.loglevel = logging.DEBUG if args.debug else logging.INFO
-
         # Set up logging.
+        self.loglevel = logging.DEBUG if args.debug else logging.INFO
         utils.set_up_logging(self)
         logging.debug(f"runmode = {self.runmode}")
 
