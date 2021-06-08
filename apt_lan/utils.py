@@ -25,6 +25,24 @@ def get_home():
 def get_hostname():
     return os.uname().nodename
 
+def get_pkg_root(app):
+    """
+    Get root folder of package, whether debian-installed or git repo.
+    """
+    pkg_root = None
+    dir = app.exe_path
+    while str(dir.parent) != app.exe_path.root:
+        git = dir.glob('.git')
+        for g in git:
+            # git repo found.
+            pkg_root = dir
+            break
+        dir = dir.parent
+    if not pkg_root:
+        pkg_root = app.exe_path.parents[1] / 'share' / app.pkg_name
+    return pkg_root
+
+
 def set_up_logging(app):
     log_path = Path(app.log_dir)
     # log_path.mkdir(parents=True, exist_ok=True) # created during package install with mod=666
