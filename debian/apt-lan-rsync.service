@@ -5,7 +5,7 @@ Documentation=man:rsync(1) man:rsyncd.conf(5)
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/rsync --daemon --no-detach --config=/usr/share/apt-lan/rsyncd.conf
+ExecStart=/usr/bin/rsync --daemon --no-detach --config=/etc/apt-lan-rsyncd.conf
 
 [Install]
 WantedBy=multi-user.target
