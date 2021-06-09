@@ -22,7 +22,9 @@ def get_dpkg_arches():
     return arches
 
 def list_archive_debs(dir):
-    # List APT archive files.
+    """
+    List APT archive files.
+    """
     archive = Path(dir)
     files = list(archive.glob('*.deb'))
     debs = [d.name for d in files]
@@ -57,6 +59,9 @@ def convert_repo_to_package_files(repo, dpkg_arches):
     return pkg_files
 
 def list_good_debs(repos):
+    """
+    List packages provided by given repositories.
+    """
     arches = get_dpkg_arches()
     approved_pkgs_list = []
     approved_lists = []

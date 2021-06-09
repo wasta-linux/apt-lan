@@ -1,0 +1,3 @@
+#!/bin/bash
+# Wrapper script for scheduling as cron task.
+apt-lan --server-sync

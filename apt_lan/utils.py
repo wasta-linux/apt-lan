@@ -3,14 +3,57 @@
 import logging
 import os
 import platform
+import shutil
 import time
 
 from pathlib import Path
 
 
 def apply_config(app):
-    print("Config:")
-    print(app.config)
+    # print(f"Config:\n{app.config}")
+
+    # Define script names.
+    scripts = {
+        'network': 'apt-lan-client',
+        'system': 'apt-lan-server',
+    }
+
+    # Ensure proper location of scripts according to config.
+    for k, v in scripts.items():
+        # Define desired cron directory for the given script.
+        freq = app.config.get(k, {}).get('frequency', 'none')
+        freq = freq.lower()
+        if freq == 'none':
+            if k == 'network':
+                dest_dir = Path('/etc/cron.hourly') # "hourly" by default
+            elif k == 'system':
+                dest_dir = Path('/etc/cron.daily') # "daily" by default
+        elif freq == 'never':
+            dest_dir = None
+        else:
+            dest_dir = Path(f"/etc/cron.{freq}")
+
+        # Find current location of script, if any.
+        posix_paths = find_script(v)
+        script_path_set = False
+        for p in posix_paths:
+            if p.parent != dest_dir:
+                print(f"Unlink {p}")
+                p.unlink()
+            else:
+                print(f"{p} in correct location.")
+                script_path_set = True
+
+        # Add link to script in dest_dir.
+        if not script_path_set:
+            print(f"Copy {v} into {dest_dir}.")
+            dest_path = dest_dir / v
+            dest_path.symlink_to(f"/usr/share/{app.pkg_name}/{v}")
+
+def find_script(script_name):
+    etc_dir = Path('/etc')
+    paths = list(etc_dir.rglob(f"cron.*/{script_name}"))
+    return paths
 
 def get_os_release():
     release = ''
@@ -47,12 +90,11 @@ def get_pkg_root(app):
     return pkg_root
 
 def get_config(app):
+    """
+    Parse config from config files.
+    """
     # Initialize config dictionary.
-    config = {
-        # 'network': {},
-        # 'repositories': [],
-        # 'system': {},
-    }
+    config = {}
 
     # Get config root directory.
     if str(app.pkg_root.parent) == '/usr/share':
@@ -87,7 +129,7 @@ def get_config(app):
             if l[0] == '#': # skip commented line
                 continue
             elif l[0] == '[': # section header
-                section = l[1:-1]
+                section = l[1:-1].lower()
                 if section == 'repositories':
                     config[section] = []
                 else:
@@ -95,7 +137,7 @@ def get_config(app):
                 continue
 
             parts = l.split('=')
-            parts = [p.strip() for p in parts]
+            parts = [p.strip().lower() for p in parts]
             if section == 'repositories':
                 config[section].append(l)
             else:
