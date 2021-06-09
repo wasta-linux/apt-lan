@@ -23,7 +23,7 @@ def run_server_sync(app):
     system_debs = pkgs.list_archive_debs(app.deb_archives.get('system'))
     logging.debug(f"System debs count: {len(system_debs)}")
     logging.debug(f"System debs: {', '.join(system_debs)}")
-    good_debs = pkgs.list_good_debs()
+    good_debs = pkgs.list_good_debs(app.config.get('repositories'))
     logging.debug(f"Good debs count: {len(good_debs)}")
     approved_debs = pkgs.list_approved_debs(system_debs, good_debs)
     logging.debug(f"Approved debs count: {len(approved_debs)}")

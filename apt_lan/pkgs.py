@@ -9,30 +9,6 @@ import subprocess
 from pathlib import Path
 
 
-def get_good_repos():
-    # TODO: Store this list in a file for easier maintenance.
-    good_repos = [
-        'http://archive.ubuntu.com/ubuntu focal main',
-        'http://archive.ubuntu.com/ubuntu focal-updates main',
-        'http://archive.ubuntu.com/ubuntu focal universe',
-        'http://archive.ubuntu.com/ubuntu focal-updates universe',
-        'http://archive.ubuntu.com/ubuntu focal multiverse',
-        'http://archive.ubuntu.com/ubuntu focal-updates multiverse',
-        'http://archive.ubuntu.com/ubuntu focal-backports main universe multiverse',
-        'http://archive.canonical.com/ubuntu focal partner',
-        'http://archive.ubuntu.com/ubuntu focal-security main',
-        'http://archive.ubuntu.com/ubuntu focal-security universe',
-        'http://archive.ubuntu.com/ubuntu focal-security multiverse',
-        'http://ppa.launchpad.net/keymanapp/keyman/ubuntu focal main',
-        'http://packages.sil.org/ubuntu focal main',
-        'https://repo.skype.com/deb stable main',
-        'http://ppa.launchpad.net/wasta-linux/cinnamon-4-6/ubuntu focal main',
-        'http://ppa.launchpad.net/wasta-linux/wasta-apps/ubuntu focal main',
-        'http://ppa.launchpad.net/wasta-linux/wasta/ubuntu focal main',
-        'http://ppa.launchpad.net/wasta-linux/wasta-wine/ubuntu focal main',
-    ]
-    return good_repos
-
 def get_dpkg_arches():
     arches = []
     cmd_native = ['dpkg', '--print-architecture']
@@ -80,8 +56,7 @@ def convert_repo_to_package_files(repo, dpkg_arches):
         pkg_files.append('_'.join(file_parts))
     return pkg_files
 
-def list_good_debs():
-    repos = get_good_repos()
+def list_good_debs(repos):
     arches = get_dpkg_arches()
     approved_pkgs_list = []
     approved_lists = []

@@ -34,5 +34,10 @@ class A(unittest.TestCase):
             expected = values[1]
             self.assertEqual(out, expected)
 
+    def test_list_good_debs(self):
+        repos = ['http://archive.ubuntu.com/ubuntu focal main']
+        good_debs = pkgs.list_good_debs(repos)
+        self.assertTrue(good_debs)
+
     def tearDown(self):
         pass
