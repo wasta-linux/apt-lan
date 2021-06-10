@@ -4,7 +4,9 @@ Priority: optional
 Maintainer: Nate Marti <nate_marti@sil.org>
 Build-Depends:
  debhelper (>= 11.0.0),
- dh-systemd
+ dh-python,
+ dh-systemd,
+ python3-all
 Standards-Version: 4.4.0
 Homepage: https://github.com/wasta-linux/apt-lan
 
@@ -13,6 +15,7 @@ Architecture: all
 Depends:
  dpkg-dev,
  rsync,
+ ${python3:Depends},
  ${misc:Depends}
 
-Description: Share curated debian packages over the LAN for easy updates.
+Description: Share APT packages over the LAN to minimize downloads.
