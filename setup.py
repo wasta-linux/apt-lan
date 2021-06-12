@@ -4,6 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 
+import glob
 import re
 from pathlib import Path
 
@@ -59,12 +60,12 @@ setup(
     ],
     data_files=[
         ('etc', [
-            list(Path.glob('data/apt-lan.conf.d', '*')),
             'data/apt-lan-rsyncd.conf',
             'data/apt-lan-conf',
         ]),
-        # ('etc/apt-lan.conf.d', [
-        #     'data/apt-lan.conf.d/00-focal-repos.conf',
-        # ])
+        ('etc/apt-lan.conf.d',
+            # Install all provided configuration files.
+            glob.glob('data/apt-lan.conf.d/*')
+        )
     ],
 )
