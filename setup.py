@@ -59,9 +59,12 @@ setup(
     ],
     data_files=[
         ('etc', [
-            'data/apt-lan.conf.d',
+            Path.glob('data/apt-lan.conf.d/*'),
             'data/apt-lan-rsyncd.conf',
             'data/apt-lan-conf',
         ]),
+        # ('etc/apt-lan.conf.d', [
+        #     'data/apt-lan.conf.d/00-focal-repos.conf',
+        # ])
     ],
 )
