@@ -10,7 +10,6 @@ from pathlib import Path
 
 
 def apply_config(app):
-    # print(f"Config:\n{app.config}")
 
     # Define script names.
     scripts = {

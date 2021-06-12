@@ -41,8 +41,6 @@ class App():
         self.exe_path = Path(cmdline[0]).resolve()
         self.pkg_root = utils.get_pkg_root(self)
         self.config = utils.get_config(self)
-        # TODO: Enable "apply config".
-        utils.apply_config(self)
 
         # Define options.
         parser = argparse.ArgumentParser()
@@ -104,6 +102,9 @@ class App():
         self.loglevel = logging.DEBUG if args.debug else logging.INFO
         utils.set_up_logging(self)
         logging.debug(f"runmode = {self.runmode}")
+
+        # Apply current config.
+        utils.apply_config(self)
 
         # Run functions for passed option.
         if args.server_sync:
