@@ -16,7 +16,6 @@ def run_server_sync(app):
 
     # Ensure that file share is properly configured.
     app.share_path.mkdir(parents=True, exist_ok=True)
-    # server.ensure_ftp_setup(app.ports[0], app.share_path, app.loglevel)
     server.ensure_rsyncd_setup(app.ports[0], app.share_path, app.loglevel)
 
     # Create a list of approved debs to copy from archives to local-cache:

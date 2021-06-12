@@ -81,7 +81,7 @@ class App():
             fmt = chlog.suffix.lstrip('.')
             # parents = list(self.pkg_root.parents)
             parents = list(chlog.parents)
-            if str(parents[-3]) != '/usr':
+            if str(parents[-2]) != '/usr':
                 chlog = self.pkg_root / 'debian' / 'changelog'
                 fmt = 'txt'
             # Parse top line of changelog file.
