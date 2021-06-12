@@ -77,21 +77,21 @@ class App():
             return 1
 
         if self.args.version:
-            chlog = Path(f"/usr/share/{self.pkg_name}/changelog.gz")
-            fmt = 'gz'
-            parents = list(self.pkg_root.parents)
-            if str(parents[-2]) != '/usr':
+            chlog = Path(f"/usr/share/doc/{self.pkg_name}/changelog.gz")
+            fmt = chlog.suffix.lstrip('.')
+            # parents = list(self.pkg_root.parents)
+            parents = list(chlog.parents)
+            if str(parents[-3]) != '/usr':
                 chlog = self.pkg_root / 'debian' / 'changelog'
                 fmt = 'txt'
-            # TODO: need to parse top line of changelog file.
+            # Parse top line of changelog file.
             try:
                 chlog.stat()
             except FileNotFoundError:
-                print('0.0')
-                return 0
+                print("No changelog found.")
+                return 1
 
             if fmt == 'gz':
-                # TODO: This needs to be tested.
                 contents = gzip.decompress(chlog.read_bytes())
                 head = f.readline().rstrip()
             else:
