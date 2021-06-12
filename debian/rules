@@ -12,8 +12,8 @@ export DH_VERBOSE=1
 %:
 	dh $@ --with python3 --buildsystem=pybuild
 
-# override_dh_installsystemd:
-	# override_dh_installsystemd --name=apt-lan-rsync apt-lan-rsync.service
+override_dh_installsystemd:
+	override_dh_installsystemd --name=apt-lan-rsync apt-lan-rsync.service
 
 #https://bugs.debian.org/cgi-bin/bugreport.cgi?att=1;bug=713857;filename=0001-use-dh-systemd-for-proper-systemd-related-maintscrip.patch;msg=5
 #override_dh_auto_install:
