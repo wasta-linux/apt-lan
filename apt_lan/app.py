@@ -70,13 +70,13 @@ class App():
             help="Log debug output."
         )
 
-        args = parser.parse_args()
-        if not any([args.apply, args.version, args.server_sync, args.client_sync]):
+        self.args = parser.parse_args()
+        if not any([self.args.apply, self.args.version, self.args.server_sync, self.args.client_sync]):
             # No command line args passed.
             parser.print_help()
             return 1
 
-        if args.version:
+        if self.args.version:
             chlog = Path(f"/usr/share/{self.pkg_name}/changelog.gz")
             fmt = 'gz'
             parents = list(self.pkg_root.parents)
@@ -103,18 +103,26 @@ class App():
             print(f"{parts[0]} {version}")
             return 0
 
+        # Ensure root permissions.
+        if not utils.check_if_root(self):
+            if not self.runmode == 'test':
+                print("Insufficient permissions. Try sudo or pkexec.")
+            return 1
+
         # Set up logging.
-        self.loglevel = logging.DEBUG if args.debug else logging.INFO
+        self.loglevel = logging.DEBUG if self.args.debug else logging.INFO
         utils.set_up_logging(self)
         logging.debug(f"runmode = {self.runmode}")
 
         # Run functions for passed option.
-        if args.apply:
+        if self.args.apply:
+            if self.runmode == 'test':
+                return 0
             # Apply current config.
             utils.apply_config(self)
             ret = 0
 
-        elif args.server_sync:
+        elif self.args.server_sync:
             # Apply current config.
             utils.apply_config(self)
 
@@ -122,7 +130,7 @@ class App():
             logging.info(f"Starting server packages sync from system.")
             ret = cmd.run_server_sync(self)
 
-        elif args.client_sync:
+        elif self.args.client_sync:
             # Apply current config.
             utils.apply_config(self)
 

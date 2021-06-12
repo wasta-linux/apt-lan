@@ -53,6 +53,9 @@ def find_script(script_name):
     paths = list(etc_dir.rglob(f"cron.*/{script_name}"))
     return paths
 
+def check_if_root(app):
+    return True if os.geteuid() == 0 else False
+
 def get_os_release():
     release = ''
     with open('/etc/os-release', 'r') as f:
@@ -148,6 +151,8 @@ def get_config(app):
     return config
 
 def set_up_logging(app):
+    if app.runmode == 'test':
+        return 0
     log_path = Path(app.log_dir)
     # log_path.mkdir(parents=True, exist_ok=True) # created during package install with mod=666
     log_file = f"{app.pkg_name}.log"
