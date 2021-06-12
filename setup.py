@@ -59,11 +59,11 @@ setup(
         'bin/apt-lan-server',
     ],
     data_files=[
-        ('etc', [
+        ('/etc', [
             'data/apt-lan-rsyncd.conf',
             'data/apt-lan.conf',
         ]),
-        ('etc/apt-lan.conf.d',
+        ('/etc/apt-lan.conf.d',
             # Install all provided configuration files.
             glob.glob('data/apt-lan.conf.d/*')
         )
