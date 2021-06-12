@@ -59,7 +59,7 @@ setup(
     ],
     data_files=[
         ('etc', [
-            Path.glob('data/apt-lan.conf.d', '*'),
+            list(Path.glob('data/apt-lan.conf.d', '*')),
             'data/apt-lan-rsyncd.conf',
             'data/apt-lan-conf',
         ]),
