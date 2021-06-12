@@ -61,7 +61,7 @@ setup(
     data_files=[
         ('etc', [
             'data/apt-lan-rsyncd.conf',
-            'data/apt-lan-conf',
+            'data/apt-lan.conf',
         ]),
         ('etc/apt-lan.conf.d',
             # Install all provided configuration files.
