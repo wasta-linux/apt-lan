@@ -17,5 +17,4 @@ Depends:
  rsync,
  ${python3:Depends},
  ${misc:Depends}
-
 Description: Share APT packages over the LAN to minimize downloads.
