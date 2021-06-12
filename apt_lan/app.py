@@ -50,6 +50,11 @@ class App():
             help='Print apt-lan version number.',
         )
         parser.add_argument(
+            '--apply', '-a',
+            action='store_true',
+            help="Apply current configuration files.",
+        )
+        parser.add_argument(
             '--server-sync', '-s',
             action='store_true',
             help="Update apt-lan archive with system's APT archive.",
@@ -103,16 +108,28 @@ class App():
         utils.set_up_logging(self)
         logging.debug(f"runmode = {self.runmode}")
 
-        # Apply current config.
-        utils.apply_config(self)
-
         # Run functions for passed option.
-        if args.server_sync:
+        if args.apply:
+            # Apply current config.
+            utils.apply_config(self)
+            ret = 0
+
+        elif args.server_sync:
+            # Apply current config.
+            utils.apply_config(self)
+
+            # Run sync.
             logging.info(f"Starting server packages sync from system.")
             ret = cmd.run_server_sync(self)
+
         elif args.client_sync:
+            # Apply current config.
+            utils.apply_config(self)
+
+            # Run sync.
             logging.info(f"Starting client packages sync from LAN.")
             ret = cmd.run_client_sync(self)
+            
         else:
             # Unknown options are handled elsewhere.
             ret = 1

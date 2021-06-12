@@ -10,7 +10,6 @@ from pathlib import Path
 
 
 def apply_config(app):
-
     # Define script names.
     scripts = {
         'network': 'apt-lan-client',
@@ -45,7 +44,7 @@ def apply_config(app):
 
         # Add link to script in dest_dir.
         if not script_path_set:
-            print(f"Copy {v} into {dest_dir}.")
+            logging.debug(f"Copy {v} into {dest_dir}.")
             dest_path = dest_dir / v
             dest_path.symlink_to(f"/usr/share/{app.pkg_name}/{v}")
 
