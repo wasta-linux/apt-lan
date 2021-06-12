@@ -6,9 +6,12 @@ from apt_lan import utils
 # Assert*() methods here:
 # https://docs.python.org/3/library/unittest.html?highlight=pytest#unittest.TestCase
 
-class B(unittest.TestCase):
+class Basic(unittest.TestCase):
     def setUp(self):
         pass
+
+    def test_root(self):
+        self.assertFalse(utils.check_if_root())
 
     def test_convert_bytes_to_human(self):
         bytes = [

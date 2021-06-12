@@ -53,7 +53,7 @@ def find_script(script_name):
     paths = list(etc_dir.rglob(f"cron.*/{script_name}"))
     return paths
 
-def check_if_root(app):
+def check_if_root():
     return True if os.geteuid() == 0 else False
 
 def get_os_release():

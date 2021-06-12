@@ -104,7 +104,7 @@ class App():
             return 0
 
         # Ensure root permissions.
-        if not utils.check_if_root(self):
+        if not utils.check_if_root():
             if not self.runmode == 'test':
                 print("Insufficient permissions. Try sudo or pkexec.")
             return 1
