@@ -71,7 +71,7 @@ class App():
         )
 
         args = parser.parse_args()
-        if not any([args.version, args.server_sync, args.client_sync]):
+        if not any([args.apply, args.version, args.server_sync, args.client_sync]):
             # No command line args passed.
             parser.print_help()
             return 1
@@ -129,7 +129,7 @@ class App():
             # Run sync.
             logging.info(f"Starting client packages sync from LAN.")
             ret = cmd.run_client_sync(self)
-            
+
         else:
             # Unknown options are handled elsewhere.
             ret = 1
