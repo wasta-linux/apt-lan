@@ -1,7 +1,9 @@
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
-from apt_lan import utils
+from apt_lan import app, utils
 
 # Assert*() methods here:
 # https://docs.python.org/3/library/unittest.html?highlight=pytest#unittest.TestCase
@@ -36,6 +38,40 @@ class Basic(unittest.TestCase):
         for i in range(len(bytes)):
             result = utils.convert_bytes_to_human(bytes[i])
             self.assertEqual(human[i], result)
+
+    def tearDown(self):
+        pass
+
+class AppObj(unittest.TestCase):
+    def setUp(self):
+        import logging
+        self.obj = app.App()
+        self.obj.exe_path = Path(__file__).resolve()
+        self.obj.loglevel = logging.DEBUG
+        self.obj.runmode = 'test'
+
+    def test_0setup_logging(self):
+        # Create temp log_dir.
+        self.obj.log_dir = Path(tempfile.mkdtemp())
+        self.obj.log_path = self.obj.log_dir / 'temp.log'
+
+        # Create log file.
+        utils.set_up_logging(self.obj)
+        self.assertTrue(self.obj.log_path.exists())
+
+        # Remove temp files.
+        self.obj.log_path.unlink()
+        self.obj.log_dir.rmdir()
+
+    def test_get_config(self):
+        self.obj.pkg_root = utils.get_pkg_root(self.obj)
+        self.obj.config = utils.get_config(self.obj)
+        self.assertTrue(self.obj.config)
+
+    def test_get_pkg_root(self):
+        repo_base = Path(__file__).parents[2]
+        self.obj.pkg_root = utils.get_pkg_root(self.obj)
+        self.assertEqual(self.obj.pkg_root, repo_base)
 
     def tearDown(self):
         pass

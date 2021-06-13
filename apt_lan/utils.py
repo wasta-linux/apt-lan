@@ -10,6 +10,8 @@ from pathlib import Path
 
 
 def apply_config(app):
+    # Get current config.
+    app.config = get_config(app)
     logging.debug(f"Config:\n{app.config}")
 
     # Define script names.
@@ -37,11 +39,12 @@ def apply_config(app):
         posix_paths = find_script(v)
         script_path_set = False
         for p in posix_paths:
+            logging.debug(f"Script path: {p}")
             if p.parent != dest_dir:
-                print(f"Unlink {p}")
+                logging.info(f"Unlink {p}")
                 p.unlink()
             else:
-                print(f"{p} in correct location.")
+                logging.debug(f"{p} in correct location.")
                 script_path_set = True
 
         # Add link to script in dest_dir.
@@ -153,24 +156,24 @@ def get_config(app):
     return config
 
 def set_up_logging(app):
-    if app.runmode == 'test':
-        return 0
-    log_path = Path(app.log_dir)
-    # log_path.mkdir(parents=True, exist_ok=True) # created during package install with mod=666
-    log_file = f"{app.pkg_name}.log"
-    file_path = log_path / log_file
-    print(f"Log file: {file_path}")
+    # Ensure log dir.
+    log_dir = Path(app.log_dir)
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    # Set up logging.
+    if app.runmode != 'test':
+        print(f"Log file: {app.log_path}")
     logging.basicConfig(
-        filename=file_path,
+        filename=app.log_path,
         level=app.loglevel,
         format='%(asctime)s %(levelname)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     ct = 54
     logging.info('=' * ct)
-    # logging.info(f"{timestamp} {hostname} {app_name} started")
     logging.info(f"{app.pkg_name} started for {app.hostname}")
     logging.info('-' * ct)
+    return app
 
 def convert_bytes_to_human(bytes):
     units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']

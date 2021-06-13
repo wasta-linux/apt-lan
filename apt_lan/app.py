@@ -26,6 +26,7 @@ class App():
         self.apt_lan_dir = Path(f'/var/cache/{self.pkg_name}')
         self.share_path = self.apt_lan_dir
         self.log_dir = Path(f'/var/log/{self.pkg_name}')
+        self.log_path = self.log_dir / f"{self.pkg_name}.log"
 
         self.os_rel = utils.get_os_release()
         self.arch_d = utils.get_arch_dir_name()
@@ -40,7 +41,6 @@ class App():
     def run(self, cmdline):
         self.exe_path = Path(cmdline[0]).resolve()
         self.pkg_root = utils.get_pkg_root(self)
-        self.config = utils.get_config(self)
 
         # Define options.
         parser = argparse.ArgumentParser()
