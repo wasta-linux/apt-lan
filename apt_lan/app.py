@@ -92,7 +92,7 @@ class App():
                 return 1
 
             if fmt == 'gz':
-                contents = gzip.decompress(chlog.read_bytes())
+                f = gzip.decompress(chlog.read_bytes())
                 head = f.readline().rstrip()
             else:
                 with open(chlog) as f:
