@@ -12,7 +12,6 @@ from pathlib import Path
 def apply_config(app):
     # Get current config.
     app.config = get_config(app)
-    logging.debug(f"Config:\n{app.config}")
 
     # Define script names.
     scripts = {
