@@ -40,7 +40,7 @@ def apply_config(app):
         for p in posix_paths:
             logging.debug(f"Script path: {p}")
             if p.parent != dest_dir:
-                logging.info(f"Unlink {p}")
+                logging.info(f"Unlinking {p}")
                 p.unlink()
             else:
                 logging.debug(f"{p} in correct location.")
@@ -48,9 +48,10 @@ def apply_config(app):
 
         # Add link to script in dest_dir.
         if not script_path_set:
-            logging.info(f"Copying {v} into {dest_dir}.")
+            logging.info(f"Symlinking /usr/bin/{v} into {dest_dir}.")
             dest_path = dest_dir / v
             dest_path.symlink_to(f"/usr/bin/{v}")
+    logging.info("Config applied.")
 
 def find_script(script_name):
     etc_dir = Path('/etc')
