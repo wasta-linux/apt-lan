@@ -50,7 +50,7 @@ def apply_config(app):
         if not script_path_set:
             logging.info(f"Copying {v} into {dest_dir}.")
             dest_path = dest_dir / v
-            dest_path.symlink_to(f"/usr/share/{app.pkg_name}/{v}")
+            dest_path.symlink_to(f"/usr/bin/{v}")
 
 def find_script(script_name):
     etc_dir = Path('/etc')
