@@ -1,4 +1,5 @@
 ### TODO
+- Test config manipulation
 - Create manpage
 
 ### systemd debian packaging
