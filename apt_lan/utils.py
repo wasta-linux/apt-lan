@@ -102,14 +102,8 @@ def get_config(app):
     # Initialize config dictionary.
     config = {}
 
-    # Get config root directory.
-    if str(app.pkg_root.parent) == '/usr/share':
-        # Installed package. Config in /etc/.
-        config_root = Path('/etc')
-    else:
-        # Assume git package. Config in ./{app.pkg_root}/data/.
-        config_root = Path(app.pkg_root) / 'data'
-    logging.debug(f"Config root: {config_root}")
+    # # Get config root directory.
+    config_root = get_config_root(app)
 
     config_lines = []
     # Get lines from config file.
@@ -120,7 +114,9 @@ def get_config(app):
 
     # Get lines from config directory files.
     config_dir = config_root / f"{app.pkg_name}.conf.d"
-    for f in config_dir.iterdir():
+    files = list(config_dir.iterdir())
+    files.sort()
+    for f in files:
         with f.open() as c:
             logging.debug(f"Reading config from {f}")
             config_lines.extend(c.readlines())
@@ -191,6 +187,18 @@ def get_arch_dir_name():
     else:
         arch_dir_name = '-'.join(['binary', os_proc])
     return arch_dir_name
+
+def get_config_root(app):
+    # Get config root directory.
+    parents = list(app.pkg_root.parents)
+    if parents[-2] == '/usr':
+        # Installed package. Config in /etc/.
+        config_root = Path('/etc')
+    else:
+        # Assume git package. Config in ./{app.pkg_root}/data/.
+        config_root = Path(app.pkg_root) / 'data'
+    logging.debug(f"Config root: {config_root}")
+    return config_root
 
 def delay_if_other_sync_in_progress(old_pkgs_gz):
     while old_pkgs_gz.is_file():
