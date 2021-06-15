@@ -5,7 +5,8 @@ Maintainer: Nate Marti <nate_marti@sil.org>
 Build-Depends:
  debhelper (>= 11.0.0),
  dh-python,
- python3-all
+ python3-all,
+ python3-setuptools
 Standards-Version: 4.4.0
 Homepage: https://github.com/wasta-linux/apt-lan
 
