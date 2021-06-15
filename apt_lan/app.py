@@ -34,8 +34,6 @@ class App():
             'system': Path('/var/cache/apt/archives'),
             'lan': self.share_path / self.os_rel / self.arch_d
         }
-        self.ports = [139, 445] # SMB
-        self.ports = [21021] # custom FTP
         self.ports = [22022] # custom rsyncd
 
     def run(self, cmdline):

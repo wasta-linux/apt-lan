@@ -192,8 +192,8 @@ def get_config_root(app):
     # Get config root directory.
     parents = list(app.pkg_root.parents)
     if parents[-2] == '/usr':
-        # Installed package. Config in /etc/.
-        config_root = Path('/etc')
+        # Installed package. Config in /etc/apt-lan/.
+        config_root = Path('/etc/apt-lan')
     else:
         # Assume git package. Config in ./{app.pkg_root}/data/.
         config_root = Path(app.pkg_root) / 'data'

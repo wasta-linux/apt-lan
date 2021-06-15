@@ -59,11 +59,15 @@ setup(
         'bin/apt-lan-server',
     ],
     data_files=[
-        ('/etc', [
+        # Keep APT packages.
+        ('/etc/apt/apt.conf.d', 'data/20keep-debs-apt-lan'),
+        # Set base default configuration.
+        ('/etc/apt-lan', [
             'data/apt-lan-rsyncd.conf',
             'data/apt-lan.conf',
         ]),
-        ('/etc/apt-lan.conf.d',
+        # Initial custom configuration.
+        ('/etc/apt-lan/apt-lan.conf.d',
             # Install all provided configuration files.
             glob.glob('data/apt-lan.conf.d/*')
         )
