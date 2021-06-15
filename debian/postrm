@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Remove apt-lan cache.
+rm -rf /var/cache/apt-lan/
