@@ -61,6 +61,8 @@ setup(
     data_files=[
         # Keep APT packages.
         ('/etc/apt/apt.conf.d', 'data/20keep-debs-apt-lan'),
+        # Add apt-lan cache as APT source.
+        ('/etc/apt/sources.list.d', 'data/apt-lan.list'),
         # Set base default configuration.
         ('/etc/apt-lan', [
             'data/apt-lan-rsyncd.conf',
