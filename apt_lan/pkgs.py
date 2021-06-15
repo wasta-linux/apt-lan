@@ -118,10 +118,12 @@ def create_packages_gz(dest_dir):
     cmd = ['dpkg-scanpackages', '--multiversion', dest_dir]
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='UTF-8')
     output = result.stdout
-    
+
     # Remove empty line and summary line from end of output.
     output_lines = output.splitlines()
     output = '\n'.join(output_lines[:-2])
+    logging.debug(f"Packages:")
+    logging.debug(f"{output}")
 
     pkg_file0 = dest_dir / 'Packages.0'
     pkg_file0.write_text(output)
