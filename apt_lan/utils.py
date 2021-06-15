@@ -191,7 +191,7 @@ def get_arch_dir_name():
 def get_config_root(app):
     # Get config root directory.
     parents = list(app.pkg_root.parents)
-    if parents[-2] == '/usr':
+    if str(parents[-2]) == '/usr':
         # Installed package. Config in /etc/apt-lan/.
         config_root = Path('/etc/apt-lan')
     else:
