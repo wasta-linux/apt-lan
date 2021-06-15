@@ -13,11 +13,12 @@ if bin_parent_dir.stem != 'usr':
     # If bin_dir's parent folder is not "/usr", then use uninstalled location.
     modules_dir = str(bin_parent_dir)
     runmode = 'uninstalled'
-else:
-    modules_dir = '/usr/share/apt_lan'
-    runmode = 'installed'
+    sys.path.append(modules_dir)
+# else:
+#     modules_dir = '/usr/share/apt_lan'
+#     runmode = 'installed'
 
-sys.path.append(modules_dir)
+# sys.path.append(modules_dir)
 from apt_lan import app
 
 if __name__ == '__main__':
