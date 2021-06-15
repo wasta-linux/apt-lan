@@ -9,6 +9,7 @@ bin_path = Path(__file__)
 bin_dir = bin_path.parents[0]
 bin_parent_dir = bin_path.parents[1]
 
+runmode = 'installed'
 if bin_parent_dir.stem != 'usr':
     # If bin_dir's parent folder is not "/usr", then use uninstalled location.
     modules_dir = str(bin_parent_dir)
