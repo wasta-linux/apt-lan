@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# Update apt-lan cache.
-/usr/bin/apt-lan --server-sync
