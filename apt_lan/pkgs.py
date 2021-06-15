@@ -122,8 +122,6 @@ def create_packages_gz(dest_dir):
     # Remove empty line and summary line from end of output.
     output_lines = output.splitlines()
     output = '\n'.join(output_lines[:-2])
-    logging.debug(f"Packages:")
-    logging.debug(f"{output}")
 
     pkg_file0 = dest_dir / 'Packages.0'
     pkg_file0.write_text(output)
