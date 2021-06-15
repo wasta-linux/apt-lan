@@ -5,7 +5,6 @@ Maintainer: Nate Marti <nate_marti@sil.org>
 Build-Depends:
  debhelper (>= 11.0.0),
  dh-python,
- dh-systemd,
  python3-all
 Standards-Version: 4.4.0
 Homepage: https://github.com/wasta-linux/apt-lan
@@ -14,7 +13,7 @@ Package: apt-lan
 Architecture: all
 Depends:
  dpkg-dev,
- rsync,
+ apt-lan-rsync,
  ${python3:Depends},
  ${misc:Depends}
 Description: Share APT packages over the LAN to minimize downloads.

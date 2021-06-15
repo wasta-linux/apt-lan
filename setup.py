@@ -64,10 +64,7 @@ setup(
         # Add apt-lan cache as APT source.
         ('/etc/apt/sources.list.d', ['data/apt-lan.list']),
         # Set base default configuration.
-        ('/etc/apt-lan', [
-            'data/apt-lan-rsyncd.conf',
-            'data/apt-lan.conf',
-        ]),
+        ('/etc/apt-lan', ['data/apt-lan.conf']),
         # Initial custom configuration.
         ('/etc/apt-lan/apt-lan.conf.d',
             # Install all provided configuration files.
