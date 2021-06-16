@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# Ensure that apt-lan cache is initially populated.
-/usr/bin/apt-lan --server-sync
