@@ -55,8 +55,6 @@ setup(
     package_dir={"apt_lan": "apt_lan"},
     scripts=[
         'bin/apt-lan',
-        'bin/apt-lan-client',
-        'bin/apt-lan-server',
     ],
     data_files=[
         # Keep APT packages.
@@ -74,7 +72,7 @@ setup(
         ('/usr/lib/apt-lan', [
             'data/apt-lan-client',
             'data/apt-lan-server',
-            'data/test-installed-package.sh'
+            'data/test-installed-package.sh',
         ])
     ],
 )
