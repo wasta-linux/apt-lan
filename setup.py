@@ -69,6 +69,12 @@ setup(
         ('/etc/apt-lan/apt-lan.conf.d',
             # Install all provided configuration files.
             glob.glob('data/apt-lan.conf.d/*')
-        )
+        ),
+        # Put system scripts under /usr/lib.
+        ('/usr/lib/apt-lan', [
+            'data/apt-lan-client',
+            'data/apt-lan-server',
+            'data/test-installed-package.sh'
+        ])
     ],
 )

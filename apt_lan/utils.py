@@ -48,9 +48,9 @@ def apply_config(app):
 
         # Add link to script in dest_dir.
         if not script_path_set:
-            logging.info(f"Symlinking /usr/bin/{v} into {dest_dir}.")
+            logging.info(f"Symlinking /usr/lib/{app.name}/{v} into {dest_dir}.")
             dest_path = dest_dir / v
-            dest_path.symlink_to(f"/usr/bin/{v}")
+            dest_path.symlink_to(f"/usr/lib/{app.name}/{v}")
     logging.info("Config applied.")
 
 def find_script(script_name):
