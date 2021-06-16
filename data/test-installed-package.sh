@@ -8,7 +8,7 @@ NAME="apt-lan-rsync"
 # Verify that service is started and enabled.
 stats=$(systemctl show apt-lan-rsync.service)
 # LoadState=loaded
-load_state=$(echo $stats | grep LoadState | awk -F'=' '{print $2}')
+load_state=$(echo "$stats" | grep LoadState | awk -F'=' '{print $2}')
 if [[ "$load_state" == 'loaded' ]]; then
     echo "${NAME}.service loaded."
 else
@@ -16,7 +16,7 @@ else
     exit 1
 fi
 # ActiveState=active
-active_state=$(echo $stats | grep ActiveState | awk -F'=' '{print $2}')
+active_state=$(echo "$stats" | grep ActiveState | awk -F'=' '{print $2}')
 if [[ "$active_state" == 'active' ]]; then
     echo "${NAME}.service active."
 else
@@ -24,7 +24,7 @@ else
     exit 1
 fi
 # SubState=running
-sub_state=$(echo $stats | grep SubState | awk -F'=' '{print $2}')
+sub_state=$(echo "$stats" | grep SubState | awk -F'=' '{print $2}')
 if [[ "$sub_state" == 'running' ]]; then
     echo "${NAME}.service running."
 else
@@ -52,3 +52,11 @@ else
     echo "Error: rsyncd not listening on port 22022."
     exit 1
 fi
+
+# ------------------------------------------------------------------------------
+# Test apt-lan
+# ------------------------------------------------------------------------------
+
+# Ensure valid Packages.gz file in apt-lan cache.
+
+# ...?
