@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # Automatically added by dh_python3:
@@ -14,11 +14,11 @@ fi
 # Ensure that APT source file exists.
 RELEASE=$(grep UBUNTU_CODENAME /etc/os-release | cut -d'=' -f2)
 ARCH='amd64'
-if [ $(uname -p) == 'i386' ]; then
+if [[ $(uname -p) == 'i386' ]]; then
 	ARCH='i386'
 fi
 list_file="/etc/apt/sources.list.d/apt-lan.list"
-if ! [ -e "$list_file" ]; then
+if ! [[ -e "$list_file" ]]; then
 	line="deb [trusted=yes] file:/var/cache/apt-lan/ ${RELEASE}/binary-${ARCH}/"
 	echo "$line" > "$list_file"
 fi
