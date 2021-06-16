@@ -58,7 +58,46 @@ echo -e "apt-lan-rsync is installed properly.\n"
 # Test apt-lan
 # ------------------------------------------------------------------------------
 NAME='apt-lan'
+RELEASE=$(grep VERSION_CODENAME /etc/os-release | cut -d'=' -f2)
+ARCH='amd64'
+if [[ $(uname -p) == 'i386' ]]; then
+    ARCH='i386'
+fi
+
+# Ensure that Packages.gz exists.
+pkg_gz="/var/cache/apt-lan/${RELEASE}/binary-${ARCH}/Packages.gz"
+if [[ ! -e $pkg_gz ]]; then
+    echo "Error: $pkg_gz does not exist."
+    exit 1
+fi
 
 # Ensure valid Packages.gz file in apt-lan cache.
+apt_update=$(sudo apt-get update)
+if [[ $? -eq 0 ]]; then
+    # Update successful, Pachages.gz file is good.
+    echo "$pkg_gz is good."
+else
+    echo "Error: apt-get update error. Maybe bad Packages.gz file?:"
+    echo "$apt_update"
+    exit 1
+fi
 
-# ...?
+# Ensure that the cron scripts are found in default locations.
+client_sync="/etc/cron.hourly/apt-lan-client"
+if [[ -x "$client_sync" ]]; then
+    echo "$client_sync found"
+else
+    echo "Error: $client_sync not found."
+    exit 1
+fi
+server_sync="/etc/cron.daily/apt-lan-server"
+if [[ -x "$server_sync" ]]; then
+    echo "$server_sync found"
+else
+    echo "Error: $server_sync not found."
+    exit 1
+fi
+
+# Ensure that other apt-lan peers can be found?
+
+# Ensure that only approved peer packages are copied locally?
