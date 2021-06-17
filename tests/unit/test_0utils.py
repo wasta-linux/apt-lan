@@ -1,3 +1,8 @@
+"""
+This test module has to go first so that logging setup is testing before any
+other calls to the logging module.
+"""
+
 import sys
 import tempfile
 import unittest
