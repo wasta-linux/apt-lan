@@ -90,12 +90,10 @@ class App():
                 return 1
 
             if fmt == 'gz':
-                # f = gzip.decompress(chlog.read_bytes())
                 with gzip.open(chlog, 'rt') as f:
                     head = f.readline().rstrip()
             else:
                 with open(chlog) as f:
-                    # head = f.read().splitlines()[0]
                     head = f.readline().rstrip()
             parts = head.split()
             version = parts[1].strip('(').strip(')')

@@ -62,6 +62,8 @@ def list_good_debs(repos):
     """
     List packages provided by given repositories.
     """
+    logging.debug(f"Approved repos:")
+    logging.debug(repos)
     arches = get_dpkg_arches()
     approved_pkgs_list = []
     approved_lists = []
@@ -70,6 +72,7 @@ def list_good_debs(repos):
         approved_lists.extend(convert_repo_to_package_files(repo, arches))
 
     for l in approved_lists:
+        logging.debug(f"Approved list: {l}")
         file = parent_dir / l
         try:
             with open(file, 'r') as f:
