@@ -14,7 +14,6 @@ class AppObj(unittest.TestCase):
         self.obj.runmode = 'test'
         sys.argv = ['', '--apply']
 
-    @unittest.skip("breaks later logging test")
     def test_apply_option(self):
         self.obj.run(sys.argv)
         self.assertTrue(self.obj.args.apply)
