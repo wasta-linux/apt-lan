@@ -72,8 +72,13 @@ def list_good_debs(repos):
         approved_lists.extend(convert_repo_to_package_files(repo, arches))
 
     for l in approved_lists:
+        # Account for l possibly having country-code server prefix.
+        apt_list_names = [f.name for f in parent_dir.iterdir()]
+        matched_list = match_filename(l, apt_list_names)
         logging.debug(f"Approved list: {l}")
-        file = parent_dir / l
+        logging.debug(f"Matched list: {matched_list}")
+        file = parent_dir / matched_list
+        
         try:
             with open(file, 'r') as f:
                 kwds = ['Package: ', 'Architecture: ', 'Version: ']
@@ -100,6 +105,16 @@ def list_good_debs(repos):
             pass
 
     return approved_pkgs_list
+
+def match_filename(approved_name, files):
+    matched_name = None
+    for file in files:
+        full_name = file
+        short_name = '.'.join(file.split('.')[1:])
+        if approved_name == full_name or approved_name == short_name:
+            matched_name = full_name
+            break
+    return matched_name
 
 def list_approved_debs(archive_debs, good_debs):
     approved_debs = [deb for deb in archive_debs if deb in good_debs]

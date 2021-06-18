@@ -1,5 +1,5 @@
 import unittest
-#from pathlib import Path
+from pathlib import Path
 
 from apt_lan import pkgs
 
@@ -45,9 +45,22 @@ class Basic(unittest.TestCase):
                     raise AssertionError
 
     def test_list_good_debs(self):
-        repos = ['http://archive.ubuntu.com/ubuntu focal main']
+        repos = [
+            'http://archive.ubuntu.com/ubuntu focal main',
+        ]
         good_debs = pkgs.list_good_debs(repos)
         self.assertTrue(good_debs)
+
+    def test_match_filename(self):
+        dir = Path('/var/lib/apt/lists')
+        approved = 'archive.ubuntu.com_ubuntu_dists_focal-updates_main_binary-amd64_Packages'
+        pkg_lists = [
+            ['fr.archive.ubuntu.com_ubuntu_dists_focal-updates_main_binary-amd64_Packages'],
+            ['archive.ubuntu.com_ubuntu_dists_focal-updates_main_binary-amd64_Packages'],
+        ]
+        for pkg_list in pkg_lists:
+            match = pkgs.match_filename(approved, pkg_list)
+            self.assertTrue(match)
 
     def tearDown(self):
         pass
