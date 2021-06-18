@@ -9,7 +9,6 @@
 import argparse
 import gzip
 import logging
-import subprocess
 import sys
 
 from pathlib import Path

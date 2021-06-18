@@ -44,6 +44,7 @@ def get_info():
     if device and conn_fam and conn_gw:
         logging.debug(f"Searching for LAN IP and netmask...")
         info_list = netifaces.ifaddresses(device)[conn_fam]
+        # TODO: How to handle IPv6?
         for i in info_list:
             lan_ip = i['addr']
             netmask = i['netmask']
@@ -149,7 +150,14 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
         if filenames == None:
             # Get file list.
             cmd.append('--list-only')
-            r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            # TODO: "text" is not available in bionic python.
+            # r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            r = subprocess.run(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+            )
             logging.debug(f"cmd: {' '.join(r.args)}")
             if r.returncode != 0:
                 logging.error(f"Failed to get file list:")
@@ -172,7 +180,13 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
                 cmd[2] = src_dir + filenames[0]
             else:
                 cmd.append('--recursive')
-            r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            # r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            r = subprocess.run(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+            )
             logging.debug(f"cmd: {' '.join(r.args)}")
             if r.returncode != 0:
                 logging.error(f"Failed to copy packages:")
