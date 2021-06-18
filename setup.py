@@ -58,16 +58,16 @@ setup(
     ],
     data_files=[
         # Keep APT packages.
-        ('/etc/apt/apt.conf.d', ['data/20keep-debs-apt-lan']),
+        ('/etc/apt/apt.conf.d', ['data/etc/20keep-debs-apt-lan']),
         # Set base default configuration.
-        ('/etc/apt-lan', ['data/apt-lan.conf']),
+        ('/etc/apt-lan', ['data/etc/apt-lan.conf']),
         # Ensure custom configuration folder.
         ('/etc/apt-lan/apt-lan.conf.d', ['data/apt-lan.conf.d/.placeholder']),
         # Put system scripts under /usr/lib.
         ('/usr/lib/apt-lan', [
-            'data/apt-lan-client',
-            'data/apt-lan-server',
-            'data/test-installed-package.sh',
+            'data/libs/apt-lan-client',
+            'data/libs/apt-lan-server',
+            'data/libs/test-installed-package.sh',
         ]),
         # Put repo lists under /usr/share.
         ('/usr/share/apt-lan', [
