@@ -196,7 +196,7 @@ def get_config_root(app):
         config_root = Path('/etc/apt-lan')
     else:
         # Assume git package. Config in ./{app.pkg_root}/data/.
-        config_root = Path(app.pkg_root) / 'data'
+        config_root = Path(app.pkg_root) / 'data' / 'etc'
     logging.debug(f"Config root: {config_root}")
     return config_root
 

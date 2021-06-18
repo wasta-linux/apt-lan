@@ -68,12 +68,12 @@ class AppObj(unittest.TestCase):
         self.obj.log_path.unlink()
         self.obj.log_dir.rmdir()
 
-    def test_get_config_root(self):
+    def test_get_config1_root(self):
         self.obj.pkg_root = utils.get_pkg_root(self.obj)
         config_root = utils.get_config_root(self.obj)
-        self.assertEqual(config_root, self.obj.pkg_root / 'data')
+        self.assertEqual(config_root, self.obj.pkg_root / 'data' / 'etc')
 
-    def test_get_config(self):
+    def test_get_config2(self):
         self.obj.pkg_root = utils.get_pkg_root(self.obj)
         self.obj.config = utils.get_config(self.obj)
         self.assertTrue(self.obj.config)
