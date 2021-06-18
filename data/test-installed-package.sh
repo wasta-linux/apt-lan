@@ -98,6 +98,8 @@ else
     exit 1
 fi
 
-# Ensure that other apt-lan peers can be found?
+# Ensure that other apt-lan peers can be found.
+#   Create 2nd system running bionic.
+#   Allow bionic and focal packages into this system's apt-lan cache.
 
 # Ensure that only approved peer packages are copied locally?
