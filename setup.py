@@ -61,16 +61,18 @@ setup(
         ('/etc/apt/apt.conf.d', ['data/20keep-debs-apt-lan']),
         # Set base default configuration.
         ('/etc/apt-lan', ['data/apt-lan.conf']),
-        # Initial custom configuration.
-        ('/etc/apt-lan/apt-lan.conf.d',
-            # Install all provided configuration files.
-            glob.glob('data/apt-lan.conf.d/*')
-        ),
+        # Ensure custom configuration folder.
+        ('/etc/apt-lan/apt-lan.conf.d', ['data/.placeholder']),
         # Put system scripts under /usr/lib.
         ('/usr/lib/apt-lan', [
             'data/apt-lan-client',
             'data/apt-lan-server',
             'data/test-installed-package.sh',
+        ]),
+        # Put repo lists under /usr/share.
+        ('/usr/share/apt-lan', [
+            'data/share/00-bionic-repos.conf',
+            'data/share/00-focal-repos.conf',
         ])
     ],
 )

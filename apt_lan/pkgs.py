@@ -77,8 +77,10 @@ def list_good_debs(repos):
         matched_list = match_filename(l, apt_list_names)
         logging.debug(f"Approved list: {l}")
         logging.debug(f"Matched list: {matched_list}")
+        if not matched_list:
+            continue
+
         file = parent_dir / matched_list
-        
         try:
             with open(file, 'r') as f:
                 kwds = ['Package: ', 'Architecture: ', 'Version: ']

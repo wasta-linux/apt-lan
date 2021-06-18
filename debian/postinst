@@ -23,5 +23,8 @@ if ! [[ -e "$list_file" ]]; then
 	echo "$line" > "$list_file"
 fi
 
+# Copy corresponding repo config file to apt-lan.conf.d.
+cp "/usr/share/apt-lan/00-${RELEASE}-repos.conf" "/etc/apt-lan/apt-lan.conf.d/"
+
 # Ensure that apt-lan cache is initially populated.
 /usr/bin/apt-lan --server-sync
