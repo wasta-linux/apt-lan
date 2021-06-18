@@ -150,7 +150,9 @@ def create_packages_gz(dest_dir):
         # Packages.0 file is good.
         oldies = [dest_dir / 'Packages', dest_dir / 'Packages.gz']
         for oldie in oldies:
-            oldie.unlink(missing_ok=True)
+            # oldie.unlink(missing_ok=True) # >= python3.8
+            if oldie.exists():
+                oldie.unlink()
         pkg_file = dest_dir / 'Packages'
         pkg_file0.rename(pkg_file)
         pkg_gz = dest_dir / 'Packages.gz'
@@ -161,8 +163,12 @@ def create_packages_gz(dest_dir):
         # Packages.0 file is zero size.
         logging.error(f"{pkg_file0} not populated. Check dpkg-scanpackages log output.")
         ret = 1
-    pkg_file0.unlink(missing_ok=True)
-    pkg_file.unlink(missing_ok=True)
+    # pkg_file0.unlink(missing_ok=True) # >= python3.8
+    if pkg_file0.exists():
+        pkg_file0.unlink()
+    # pkg_file.unlink(missing_ok=True) # >= python3.8
+    if pkg_file.exists():
+        pkg_file.unlink()
     return ret
 
 def get_superseded_debs(file):
@@ -179,7 +185,9 @@ def rebuild_pkgs_gz(dest_dir, pkgs_gz, old_pkgs_gz):
     r = create_packages_gz(dest_dir)
     if r == 0:
         logging.info(f"Packages.gz file created.")
-        old_pkgs_gz.unlink(missing_ok=True)
+        # old_pkgs_gz.unlink(missing_ok=True) # >= python3.8
+        if old_pkgs_gz.exists():
+            old_pkgs_gz.unlink()
         logging.debug(f"Packages.gz.old removed.")
         ret = 0
     else:
