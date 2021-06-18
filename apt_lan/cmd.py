@@ -20,12 +20,12 @@ def run_server_sync(app):
 
     # Create a list of approved debs to copy from archives to local-cache:
     system_debs = pkgs.list_archive_debs(app.deb_archives.get('system'))
-    logging.debug(f"System debs count: {len(system_debs)}")
-    logging.debug(f"System debs: {', '.join(system_debs)}")
+    logging.info(f"System debs count: {len(system_debs)}")
+    # logging.debug(f"System debs: {', '.join(system_debs)}")
     good_debs = pkgs.list_good_debs(app.config.get('repositories'))
-    logging.debug(f"Good debs count: {len(good_debs)}")
+    logging.debug(f"Allowed debs count: {len(good_debs)}")
     approved_debs = pkgs.list_approved_debs(system_debs, good_debs)
-    logging.debug(f"Approved debs count: {len(approved_debs)}")
+    logging.info(f"Approved debs count: {len(approved_debs)}")
     logging.debug(f"Approved debs: {', '.join(approved_debs)}")
 
     # Copy debs in the approved list to lan_archive if adequate space.
