@@ -13,8 +13,9 @@ Homepage: https://github.com/wasta-linux/apt-lan
 Package: apt-lan
 Architecture: all
 Depends:
- dpkg-dev,
  apt-lan-rsync,
+ dpkg-dev,
+ python3-psutil,
  ${python3:Depends},
  ${misc:Depends}
 Description: Share APT packages over the LAN to minimize downloads.
