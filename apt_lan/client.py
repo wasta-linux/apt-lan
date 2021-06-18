@@ -116,42 +116,13 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
     logging.debug(f"Share IP: {share_ip}")
     logging.debug(f"Share subfolder path: {dir_path}")
 
-    if port == 139: # SMB
-        for filename in filenames:
-            uri = f"{share_uri}/{filename}"
-            get_smb_uri_smbget(uri) # doesn't work for files with "%" in URI.
-            # get_smb_uri_curl(uri) # doesn't work with guest access
-    elif port == 21021: # Wasta FTP
-        ftp = FTP()
-        try:
-            r = ftp.connect(host=share_ip, port=port, timeout=120)
-            logging.debug(f"ftp.connect: {r}")
-        except ConnectionRefusedError as e:
-            logging.debug(f"ftp.connect: {e}")
-            return 1
-        r = ftp.login()
-        logging.debug(f"ftp.login: {r}")
-        r = ftp.cwd(dir_path)
-        logging.debug(f"ftp.cwd: {r}")
-        if filenames == None:
-            # Get file list.
-            names = ftp.nlst()
-            logging.debug(f"Files found at {share_ip}: {names}")
-            return names
-        else:
-            # Get files.
-            for filename in filenames:
-                # uri = f"{share_uri}/{filename}"
-                get_ftp_file(ftp, filename)
-        ftp.quit()
-
-    elif port == 22022: # Wasta rsync
+    if port == 22022: # Wasta rsync
+        # TODO: Need to verify that requested release and arch folders exist.
         cmd = ['rsync', f'--port={port}', f'{share_uri}/']
         if filenames == None:
             # Get file list.
             cmd.append('--list-only')
-            # TODO: "text" is not available in bionic python.
-            # r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            # r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True) # python3.7
             r = subprocess.run(
                 cmd,
                 stdout=subprocess.PIPE,
@@ -180,7 +151,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
                 cmd[2] = src_dir + filenames[0]
             else:
                 cmd.append('--recursive')
-            # r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            # r = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True) # python3.7
             r = subprocess.run(
                 cmd,
                 stdout=subprocess.PIPE,
@@ -194,3 +165,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
 
     os.chdir(orig_cwd)
     logging.debug(f"cd to {orig_cwd}")
+
+def verify_rsync_folder(uri):
+    status = False
+    return status
