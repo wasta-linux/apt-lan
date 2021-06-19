@@ -79,7 +79,7 @@ class AppObj(unittest.TestCase):
         self.assertTrue(self.obj.config)
 
     def test_get_pkg_root(self):
-        repo_base = Path(__file__).parents[2]
+        repo_base = Path(__file__).parents[1]
         self.obj.pkg_root = utils.get_pkg_root(self.obj)
         self.assertEqual(self.obj.pkg_root, repo_base)
 
