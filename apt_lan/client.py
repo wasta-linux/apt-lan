@@ -132,7 +132,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             )
             logging.debug(f"cmd: {' '.join(r.args)}")
             if r.returncode == 23:
-                logging.error(f"Skipping missing folder at {share_uri}.")
+                logging.warning(f"Skipping missing folder at {share_uri}.")
                 return []
             elif r.returncode != 0:
                 logging.error(f"Failed to get file list:")
@@ -164,7 +164,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
             )
             logging.debug(f"cmd: {' '.join(r.args)}")
             if r.returncode == 23:
-                logging.error(f"Skipping missing folder at {share_uri}.")
+                logging.warning(f"Skipping missing folder at {share_uri}.")
                 return
             elif r.returncode != 0:
                 logging.error(f"Failed to get file list:")
@@ -173,7 +173,3 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
 
     # os.chdir(orig_cwd)
     # logging.debug(f"cd to {orig_cwd}")
-
-def verify_rsync_folder(uri):
-    status = False
-    return status
