@@ -178,7 +178,7 @@ def run_client_sync(app):
     old_pkgs_gz = dest_dir / 'Packages.gz.old'
 
     # Get LAN IP and subnet.
-    own_ip, netmask = client.get_info()
+    own_ip, netmask = client.get_network_info()
     if not own_ip or not netmask:
         logging.error(f"LAN details not found; device: {device}, family: {conn_fam}, gateway: {conn_gw}")
         return 1

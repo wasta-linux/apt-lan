@@ -19,14 +19,14 @@ def lan_connect(hostname, port):
     logging.debug(f"result: {result}; {os.strerror(result)}")
     return result == 0
 
-def get_info():
+def get_network_info():
     gws = netifaces.gateways()
     # Listed in order of priority. First one found wins.
     families = [
         netifaces.AF_BLUETOOTH,
         netifaces.AF_PPPOX,
+        netifaces.AF_INET, # prefer IPv4 over IPv6
         netifaces.AF_INET6,
-        netifaces.AF_INET,
     ]
     conn_fam = None
     logging.debug(f"Searching for connection gateway...")
@@ -44,10 +44,16 @@ def get_info():
     if device and conn_fam and conn_gw:
         logging.debug(f"Searching for LAN IP and netmask...")
         info_list = netifaces.ifaddresses(device)[conn_fam]
+        logging.debug(f"iface info: {info_list}")
         # TODO: How to handle IPv6?
         for i in info_list:
             lan_ip = i['addr']
             netmask = i['netmask']
+            # ipaddress v3.9.5 can't handle expanded IPv6 netmasks.
+            # ref:
+            #   https://docs.python.org/3/library/ipaddress.html?highlight=expanded%20netmasks#ipaddress.IPv6Network
+            if netmask = 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff':
+                netmask = 128
             netw = ipaddress.ip_network(f"{lan_ip}/{netmask}", strict=False)
             logging.info(f"Network: {lan_ip}/{netmask}")
             if ipaddress.ip_address(conn_gw) in netw:
