@@ -193,7 +193,8 @@ def run_client_sync(app):
     superseded_debs_own = pkgs.get_superseded_debs(superseded_debs_file)
     logging.debug(f"{len(superseded_debs_own)} superseded packages already identified.")
     for ip in share_ips:
-        share_uri = f"ftp://{ip}/{app.os_rel}/{app.arch_d}"
+        # TODO: Fix to get debs from any release listed in app.config.repositories.
+        #   Currently only gets debs matching system OS release.
         share_uri = f"rsync://{ip}/apt-lan/{app.os_rel}/{app.arch_d}"
         # Get file list from IP address.
         ip_files = client.get_files_from_share(share_uri, app.ports[0])
