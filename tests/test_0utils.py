@@ -84,6 +84,5 @@ class AppObj(unittest.TestCase):
             tree = p.name.split('/')
             if tree[-1] == 'apt-lan':
                 repo_base = p
-        # repo_base = Path(__file__).parents[1]
         self.obj.pkg_root = utils.get_pkg_root(self.obj)
         self.assertEqual(self.obj.pkg_root, repo_base)
