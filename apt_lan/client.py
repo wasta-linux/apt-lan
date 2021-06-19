@@ -106,9 +106,9 @@ def get_ftp_file(ftp, filename):
 def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
     orig_cwd = os.getcwd()
     logging.debug(f"share_uri: {share_uri}")
-    if dst_dir:
-        os.chdir(dst_dir)
-        logging.debug(f"cd to {dst_dir}")
+    # if dst_dir:
+    #     os.chdir(dst_dir)
+    #     logging.debug(f"cd to {dst_dir}")
     uri_parts = share_uri.split('/')
     share_ip = uri_parts[2]
     # Shared folder "local-cache" is parent. Only "focal", etc. are visible.
@@ -118,6 +118,7 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
 
     if port == 22022: # Wasta rsync
         # TODO: Need to verify that requested release and arch folders exist.
+        #   See the verify_rsync_folder function below.
         cmd = ['rsync', f'--port={port}', f'{share_uri}/']
         if filenames == None:
             # Get file list.
@@ -130,10 +131,13 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
                 universal_newlines=True,
             )
             logging.debug(f"cmd: {' '.join(r.args)}")
-            if r.returncode != 0:
+            if r.returncode == 23:
+                logging.error(f"Skipping missing folder at {share_uri}.")
+                return []
+            elif r.returncode != 0:
                 logging.error(f"Failed to get file list:")
                 logging.error(r.stdout)
-                exit()
+                return []
             lines = r.stdout.splitlines()
             files = [l.split()[-1] for l in lines]
             logging.debug(f"File list:")
@@ -159,12 +163,16 @@ def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
                 universal_newlines=True,
             )
             logging.debug(f"cmd: {' '.join(r.args)}")
-            if r.returncode != 0:
-                logging.error(f"Failed to copy packages:")
+            if r.returncode == 23:
+                logging.error(f"Skipping missing folder at {share_uri}.")
+                return
+            elif r.returncode != 0:
+                logging.error(f"Failed to get file list:")
                 logging.error(r.stdout)
+                return
 
-    os.chdir(orig_cwd)
-    logging.debug(f"cd to {orig_cwd}")
+    # os.chdir(orig_cwd)
+    # logging.debug(f"cd to {orig_cwd}")
 
 def verify_rsync_folder(uri):
     status = False
