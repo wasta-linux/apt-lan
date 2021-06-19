@@ -17,8 +17,8 @@ class Basic(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_root(self):
-        self.assertFalse(utils.check_if_root())
+    def tearDown(self):
+        pass
 
     def test_convert_bytes_to_human(self):
         bytes = [
@@ -44,9 +44,6 @@ class Basic(unittest.TestCase):
             result = utils.convert_bytes_to_human(bytes[i])
             self.assertEqual(human[i], result)
 
-    def tearDown(self):
-        pass
-
 class AppObj(unittest.TestCase):
     def setUp(self):
         import logging
@@ -54,6 +51,9 @@ class AppObj(unittest.TestCase):
         self.obj.exe_path = Path(__file__).resolve()
         self.obj.loglevel = logging.DEBUG
         self.obj.runmode = 'test'
+
+    def tearDown(self):
+        pass
 
     def test_0setup_logging(self):
         # Create temp log_dir.
@@ -79,9 +79,11 @@ class AppObj(unittest.TestCase):
         self.assertTrue(self.obj.config)
 
     def test_get_pkg_root(self):
-        repo_base = Path(__file__).parents[1]
+        parents = Path(__file__).parents
+        for p in parents:
+            tree = p.name.split('/')
+            if tree[-1] == 'apt-lan':
+                repo_base = p
+        # repo_base = Path(__file__).parents[1]
         self.obj.pkg_root = utils.get_pkg_root(self.obj)
         self.assertEqual(self.obj.pkg_root, repo_base)
-
-    def tearDown(self):
-        pass
