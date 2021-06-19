@@ -14,6 +14,9 @@ class Basic(unittest.TestCase):
     def setUp(self):
         pass
 
+    def tearDown(self):
+        pass
+
     @unittest.skip("incomplete test")
     def test_verify_rsync_folder(self):
         # TODO: Need to create a temporary rsync share for this test.
@@ -41,6 +44,3 @@ class Basic(unittest.TestCase):
         r_svc.kill()
         r_temp_config.unlink()
         r_temp.unlink()
-
-    def tearDown(self):
-        pass

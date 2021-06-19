@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from apt_lan import pkgs
+from apt_lan import pkgs, utils
 
 # Assert*() methods here:
 # https://docs.python.org/3/library/unittest.html?highlight=pytest#unittest.TestCase
@@ -45,8 +45,9 @@ class Basic(unittest.TestCase):
                     raise AssertionError
 
     def test_list_good_debs(self):
+        release = utils.get_os_release()
         repos = [
-            'http://archive.ubuntu.com/ubuntu focal main',
+            f'http://archive.ubuntu.com/ubuntu {release} main',
         ]
         good_debs = pkgs.list_good_debs(repos)
         self.assertTrue(good_debs)
