@@ -6,8 +6,6 @@ import socket
 import subprocess
 import time
 
-from ftplib import FTP
-
 
 def lan_connect(hostname, port):
     logging.debug(f"Connecting to {hostname}:{port}...")
@@ -81,32 +79,6 @@ def get_share_ips(own_ip, netmask, ports):
             logging.debug(f"LAN share IP found: {ip}")
             lan_ips.append(str(ip))
     return lan_ips
-
-def get_smb_uri_smbget(uri):
-    cmd = ['smbget', '--guest', uri] # smbget fails to retrieve files with "%" in them
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    if result.returncode == 0:
-        logging.debug(f"smbget: {uri} downloaded.")
-    else:
-        logging.error(f"smbget: {result.stdout}")
-
-def get_smb_uri_curl(uri):
-    c = pycurl.Curl()
-    # TODO: cURL needs login info, but what is it for a guest account?
-    # $ net usershare info --long
-    # "Everyone"?
-    logging.debug(f"cURL: {uri}")
-    with open(filename, 'wb') as f:
-        c.setopt(c.URL, uri)
-        c.setopt(c.WRITEDATA, f)
-        c.perform()
-    c.close()
-
-def get_ftp_file(ftp, filename):
-    logging.debug(f"Getting FTP file: {filename}")
-    with open(filename, 'wb') as f:
-        r = ftp.retrbinary(f'RETR {filename}', f.write)
-    logging.debug(f"Result: {r}")
 
 def get_files_from_share(share_uri, port, filenames=None, dst_dir=None):
     orig_cwd = os.getcwd()
