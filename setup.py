@@ -62,7 +62,7 @@ setup(
         # Set base default configuration and user config folder.
         ('/etc/apt-lan', ['data/etc/apt-lan.conf']),
         # Ensure custom configuration folder.
-        ('/etc/apt-lan/apt-lan.conf.d', ['data/apt-lan.conf.d/.placeholder']),
+        ('/etc/apt-lan/apt-lan.conf.d', ['data/etc/apt-lan.conf.d/.placeholder']),
         # Put system scripts under /usr/lib.
         ('/usr/lib/apt-lan', [
             'data/libs/apt-lan-client',
